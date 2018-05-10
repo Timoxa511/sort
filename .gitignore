@@ -14,6 +14,12 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
+# MinGW 
+*.o
+*.save
+*.exe
+*.log
+
 # Windows shortcuts
 *.lnk
 
