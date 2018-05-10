@@ -1,3 +1,7 @@
+
+#ifndef HINT
+#define HINT
+
 #define _USE_MATH_DEFINES
 
 #pragma GCC diagnostic ignored "-Weffc++"
@@ -7,7 +11,6 @@
 #include <math.h>
 #include <assert.h>
 #include <string>
-
 
 
 //{Prototypes------------------------------------------------------------------
@@ -33,7 +36,7 @@ class int_t
 
     void operator =   (const int_t& int_o);
     int* operator &   ();
-         operator int ();
+         operator int () const;
 
     int getval () const;
     };
@@ -95,7 +98,7 @@ void int_t::operator = (const int_t& int_o)
     }
 
 //-----------------------------------------------------------------------------
-int_t::operator int ()
+int_t::operator int () const
     {
     return val_;
     }
@@ -178,7 +181,7 @@ int_t operator "" t (unsigned long long a)
 //-----------------------------------------------------------------------------
 
 
-
+#endif
 
 
 
