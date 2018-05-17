@@ -2,6 +2,8 @@
 #include "homemade_int.h"
 
 
+
+
 //{Templates-------------------------------------------------------------------
 template <typename T>
 int ArrCmp (const T ti [], int tvoiDostizhseniya, const T sinMaminoyPodrugi [], int podvigiSinaMaminoyPodrugi)
@@ -63,8 +65,10 @@ int ArrCmp (const T c3p0 [], std::initializer_list <T> arr2d2)
 const int Range = 100;
 
 template <typename T>
-void VPrintf (const T arr [], size_t arrsz, const char* str, va_list strPrms)
+void PrintfHeart (const T arr [], size_t arrsz, const char* str, va_list strPrms)
     {
+
+
 
     char outstr [Str_param_length] = "";
     int str_length = vsprintf (outstr, str, strPrms); //printf
@@ -92,7 +96,12 @@ void VPrintf (const T arr [], size_t arrsz, const char* str, va_list strPrms)
             }
         }
 
-        { $sy; printf ("\t%s\n\n", outstr); }
+    CONSOLE_SCREEN_BUFFER_INFO bundleOfGears = {};
+    GetConsoleScreenBufferInfo (GetStdHandle(STD_OUTPUT_HANDLE), &bundleOfGears);
+    int consoleLen = bundleOfGears.dwSize.X;
+    int cursorPosX = bundleOfGears.dwCursorPosition.X;
+
+        { $sy; printf ("%*s\n", consoleLen - cursorPosX - 1, outstr); }
     }
 
 
@@ -103,7 +112,7 @@ void Printf (const T (&arr) [N], const char* str, ...)
     va_list strPrms;
     va_start (strPrms, str);
 
-    VPrintf (arr, N, str, strPrms);
+    PrintfHeart (arr, N, str, strPrms);
 
     va_end (strPrms);
     }
@@ -115,7 +124,7 @@ void Printf (const T arr [], size_t arrsz, const char* str, ...)
     va_list strPrms;
     va_start (strPrms, str);
 
-    VPrintf (arr, arrsz, str, strPrms);
+    PrintfHeart (arr, arrsz, str, strPrms);
 
     va_end (strPrms);
     }

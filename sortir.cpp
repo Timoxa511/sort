@@ -30,13 +30,13 @@ void BubbleSort (T arr [], size_t arrsz)
     {
     for (int i = 0; i < arrsz; i++)
         {
-        int sorted = true;
+        bool sorted = true;
         for (int j = 0; j < arrsz - 1 - i; j++)
             {
             assert (0 <= j && j < arrsz);
             assert (0 <= j + 1 && j + 1 < arrsz);
 
-            if (arr[id(j)] > arr[id(j + 1)])  { std::swap (arr[j], arr[j + 1]); sorted = false; }
+            if (arr[j] > arr[j + 1])  { /*swap (arr[j], arr[j + 1]fuck*/ TempSwap ( arr, j, j + 1); sorted = false; }
             }
         if (sorted) break;
         }
@@ -62,7 +62,7 @@ void Test ()
     FillArr (arr, n);
     Printf  (arr, n, "zapolnenijje na %u elems", n);
 
-    BubbleSort (arr);
+    BubbleSort (arr, n);
     Printf  (arr, "sortirovka");
 
     }
@@ -101,16 +101,18 @@ void FillArr (int arr [], size_t arrsz)
     BubbleSort (experimantalMouse);                                                                                                                   \
     if (ArrCmp(experimantalMouse, expected) && int_t::Swaps == swaps && int_t::Compares == compares)  {$sg; Printf (experimantalMouse, "uTest");}     \
                                                                                                  else {$sr; Printf (experimantalMouse, "uTest");}     \
+    printf ("%d, %d\n", int_t::Swaps, int_t::Compares);                                                                                               \
     }
 
 #define _ ,
 
 bool BubbleSortTest ()
     {
+
     unitTest ({1t}, {1t}, 0, 0);
     unitTest ({1t _ 2t _ 3t _ 4t _ 5t _ 6t}, {1t _ 2t _ 3t _ 4t _ 5t _ 6t}, 0, 5);
 
-    //unitTest ({1t _ 4t _ 3t _ 2t _ 5t _ 6t}, {1t _ 2t _ 3t _ 4t _ 5t _ 6t}, 0, 5);
+    unitTest ({1t _ 3t _ 2t _ 4t _ 5t _ 6t}, {1t _ 2t _ 3t _ 4t _ 5t _ 6t}, 1, 9);
     }
 
 #undef unitTest

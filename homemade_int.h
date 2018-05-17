@@ -12,7 +12,6 @@
 #include <assert.h>
 #include <string>
 
-
 //{Prototypes------------------------------------------------------------------
 
 class int_t
@@ -50,6 +49,7 @@ bool operator >  (const int_t& a, const int_t& b);
 bool operator >= (const int_t& a, const int_t& b);
 bool operator == (const int_t& a, const int_t& b);
 void swap (int_t& a, int_t& b);
+void TempSwap (int_t arr [], int a, int b);
 //}
 //-----------------------------------------------------------------------------
 
@@ -114,7 +114,6 @@ int* int_t::operator & ()
 
 
 //{operators-------------------------------------------------------------------
-
 int_t operator - (const int_t& a, const int_t& b)
     {
     return a.getval() - b.getval();
@@ -172,6 +171,12 @@ void swap (int_t& a, int_t& b)
     std::swap (a, b);
     }
 
+void TempSwap (int_t arr [], int a, int b)
+    {
+    int_t::Swaps += 1;
+    std::swap (arr[a], arr[b]);
+    }
+
 int_t operator "" t (unsigned long long a)
     {
     return int_t(a);
@@ -179,6 +184,7 @@ int_t operator "" t (unsigned long long a)
 
 //}
 //-----------------------------------------------------------------------------
+
 
 
 #endif
