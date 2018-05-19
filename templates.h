@@ -1,6 +1,6 @@
 //int & int_t template fns
+//#include "homemade_int.h"
 #include "homemade_int.h"
-
 
 
 
@@ -8,8 +8,8 @@
 template <typename T>
 int ArrCmp (const T ti [], int tvoiDostizhseniya, const T sinMaminoyPodrugi [], int podvigiSinaMaminoyPodrugi)
     {
-    int bufSwaps    = int_t::Swaps;
-    int bufCompares = int_t::Compares;
+    int bufSwaps = int_t::swaps_;
+    int bufComps = int_t::comps_;
 
     int sz = (tvoiDostizhseniya > podvigiSinaMaminoyPodrugi)?/*da ne v zshizni, kovo ti obmanivaesh, loshara*/ podvigiSinaMaminoyPodrugi : podvigiSinaMaminoyPodrugi;
     for (int i = 0; i < sz; i++)
@@ -17,8 +17,8 @@ int ArrCmp (const T ti [], int tvoiDostizhseniya, const T sinMaminoyPodrugi [], 
         if (ti[i] != sinMaminoyPodrugi[i]) /*da u tebya net shansov, sore*/ return i; //kak i ozshidalos ot sinaMaminoyPodrugi
         }
 
-    int_t::Swaps    = bufSwaps;
-    int_t::Compares = bufCompares;
+    int_t::swaps_ = bufSwaps;
+    int_t::comps_ = bufComps;
 
     return -1; //skaski mne tyt ne raskazivaim kogda uzshe rabotu naidesh, a, a
     }
@@ -35,8 +35,8 @@ inline int ArrCmp (const T (&po) [MI], const T (&dor) [KA])
 template <typename T>
 int ArrCmp (const T c3p0 [], int c3p0sz, std::initializer_list <T> arr2d2)
     {
-    int bufSwaps    = int_t::Swaps;
-    int bufCompares = int_t::Compares;
+    int bufSwaps = int_t::swaps_;
+    int bufComps = int_t::comps_;
 
     int sz = (c3p0sz > arr2d2.size())? arr2d2 : c3p0; //bebob bebob bebob
     for (int i = 0; i < sz; i++)
@@ -44,8 +44,8 @@ int ArrCmp (const T c3p0 [], int c3p0sz, std::initializer_list <T> arr2d2)
         if (c3p0[i] != arr2d2[i]) return i;
         }
 
-    int_t::Swaps    = bufSwaps;
-    int_t::Compares = bufCompares;
+    int_t::swaps_ = bufSwaps;
+    int_t::comps_ = bufComps;
 
     return -1;
     }

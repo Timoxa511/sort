@@ -36,7 +36,7 @@ void BubbleSort (T arr [], size_t arrsz)
             assert (0 <= j && j < arrsz);
             assert (0 <= j + 1 && j + 1 < arrsz);
 
-            if (arr[j] > arr[j + 1])  { /*swap (arr[j], arr[j + 1]fuck*/ TempSwap ( arr, j, j + 1); sorted = false; }
+            if (arr[j] > arr[j + 1])  { Swap (arr[j], arr[j + 1]); sorted = false; }
             }
         if (sorted) break;
         }
@@ -57,9 +57,9 @@ inline void BubbleSort (T (&arr) [N])     //cause arrays are references (shock c
 void Test ()
     {
     const size_t n = 10;
-    int arr [n] = {};
+    int_t arr [n] = {};
 
-    FillArr (arr, n);
+    //FillArr (arr, n);
     Printf  (arr, n, "zapolnenijje na %u elems", n);
 
     BubbleSort (arr, n);
@@ -74,7 +74,9 @@ int main ()
     #ifdef PrintfDebug
     Test ();
     #else
+
     BubbleSortTest ();
+
     #endif
     }
 
@@ -94,14 +96,14 @@ void FillArr (int arr [], size_t arrsz)
 
 //-----------------------------------------------------------------------------
 
-#define unitTest(initializer_list, expected, swaps, compares)                                                                                         \
+#define unitTest(initializer_list, expected, swaps, comps)                                                                                         \
     {                                                                                                                                                 \
-    int_t experimantalMouse [] = initializer_list;                                                                                                    \
+    int_t experimentalMouse [] = initializer_list;                                                                                                    \
     int_t::resetCounters ();                                                                                                                          \
-    BubbleSort (experimantalMouse);                                                                                                                   \
-    if (ArrCmp(experimantalMouse, expected) && int_t::Swaps == swaps && int_t::Compares == compares)  {$sg; Printf (experimantalMouse, "uTest");}     \
-                                                                                                 else {$sr; Printf (experimantalMouse, "uTest");}     \
-    printf ("%d, %d\n", int_t::Swaps, int_t::Compares);                                                                                               \
+    BubbleSort (experimentalMouse);                                                                                                                   \
+    if (ArrCmp(experimentalMouse, expected) && int_t::swaps_ == swaps && int_t::comps_ == comps)  {$sg; Printf (experimentalMouse, "uTest");}     \
+                                                                                             else {$sr; Printf (experimentalMouse, "uTest");}     \
+    printf ("%d, %d\n", int_t::swaps_, int_t::comps_);                                                                                               \
     }
 
 #define _ ,

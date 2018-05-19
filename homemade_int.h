@@ -20,8 +20,8 @@ class int_t
     int val_;
     public:
 
-    static int Swaps;
-    static int Compares;
+    static int swaps_;
+    static int comps_;
     //-----------------------------
 
     public:
@@ -40,16 +40,15 @@ class int_t
     int getval () const;
     };
 
-int int_t::Swaps = 0;
-int int_t::Compares = 0;
+int int_t::swaps_ = 0;
+int int_t::comps_ = 0;
 
 bool operator <  (const int_t& a, const int_t& b);
 bool operator <= (const int_t& a, const int_t& b);
 bool operator >  (const int_t& a, const int_t& b);
 bool operator >= (const int_t& a, const int_t& b);
 bool operator == (const int_t& a, const int_t& b);
-void swap (int_t& a, int_t& b);
-void TempSwap (int_t arr [], int a, int b);
+void Swap (int_t& a, int_t& b);
 //}
 //-----------------------------------------------------------------------------
 
@@ -79,8 +78,8 @@ int_t::int_t (const int_t& int_o) :
 //=============================================================================
 void int_t::resetCounters ()
     {
-    Swaps = 0;
-    Compares = 0;
+    swaps_ = 0;
+    comps_ = 0;
     }
 
 
@@ -136,44 +135,44 @@ int_t operator / (const int_t& a, const int_t& b)
 
 bool operator < (const int_t& a, const int_t& b)
     {
-    int_t::Compares += 1;
+    int_t::comps_ += 1;
     return a.getval() < b.getval();
     }
 
 bool operator <= (const int_t& a, const int_t& b)
     {
-    int_t::Compares += 1;
+    int_t::comps_ += 1;
     return a.getval() <= b.getval();
     }
 
 bool operator > (const int_t& a, const int_t& b)
     {
-    int_t::Compares += 1;
+    int_t::comps_ += 1;
     return a.getval() > b.getval();
     }
 
 bool operator >= (const int_t& a, const int_t& b)
     {
-    int_t::Compares += 1;
+    int_t::comps_ += 1;
     return a.getval() >= b.getval();
     }
 
 bool operator == (const int_t& a, const  int_t& b)
     {
-    int_t::Compares += 1;
+    int_t::comps_ += 1;
     return a.getval() == b.getval();
     }
 
 
-void swap (int_t& a, int_t& b)
+void Swap (int_t& a, int_t& b)
     {
-    int_t::Swaps += 1;
+    int_t::swaps_ += 1;
     std::swap (a, b);
     }
 
 void TempSwap (int_t arr [], int a, int b)
     {
-    int_t::Swaps += 1;
+    int_t::swaps_ += 1;
     std::swap (arr[a], arr[b]);
     }
 
