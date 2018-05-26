@@ -52,7 +52,6 @@ int ArrCmp (const T c3p0 [], int c3p0sz, std::initializer_list <T> arr2d2)
 
 //-----------------------------------------------------------------------------
 const int Str_param_length = 300;
-
 template <typename T, int c3p0sz>
 int ArrCmp (const T c3p0 [], std::initializer_list <T> arr2d2)
     {
@@ -63,71 +62,91 @@ int ArrCmp (const T c3p0 [], std::initializer_list <T> arr2d2)
 
 //-----------------------------------------------------------------------------
 const int Range = 100;
-
 template <typename T>
-void PrintfHeart (const T arr [], size_t arrsz, const char* str, va_list strPrms)
+void PrintfHeart (const T arr [], size_t arrsz, int lEdge, int curr, int rEdge, bool numeration, const char* str, va_list strPrms)
     {
+    assert (lEdge <= curr && curr < rEdge);
 
+        {
+        $sd
+        if (numeration)
+        for (int i = 0; i < arrsz; i++)
+            {
+            printf ("%*d ", (int) log10 (Range), i);
+            }
+
+
+        printf ("\n");
+
+
+        for (int i = 0; i < arrsz; i++)
+            {
+            if (i == curr) $m
+            else if (i <= lEdge) $c
+            else if (lEdge < i && i < rEdge) $y
+            else if (rEdge <= i) $b
+
+            printf ("%*d ", (int) log10 (Range), (int) arr[i]);
+            }
+        }
 
 
     char outstr [Str_param_length] = "";
     int str_length = vsprintf (outstr, str, strPrms); //printf
     assert (str_length < Str_param_length);
 
-
-
-
-        {
-
-
-        for (int i = 0; i < arrsz; i++)
-            {
-            printf ("%*d ", (int) log10 (Range), i);
-            }
-        printf ("\n");
-        }
-
-        {
-
-
-        for (int i = 0; i < arrsz; i++)
-            {
-            printf ("%*d ", (int) log10 (Range), (int) arr[i]);
-            }
-        }
-
     CONSOLE_SCREEN_BUFFER_INFO bundleOfGears = {};
     GetConsoleScreenBufferInfo (GetStdHandle(STD_OUTPUT_HANDLE), &bundleOfGears);
     int consoleLen = bundleOfGears.dwSize.X;
     int cursorPosX = bundleOfGears.dwCursorPosition.X;
 
-        { $sy; printf ("%*s\n", consoleLen - cursorPosX - 1, outstr); }
+    printf ("%*s\n", consoleLen - cursorPosX - 1, outstr);
     }
-
 
 //-----------------------------------------------------------------------------
 template <typename T, int N>
-void Printf (const T (&arr) [N], const char* str, ...)
+void Printf (const T (&arr) [N], int lEdge, int curr, int rEdge, bool numeration, const char* str, ...)
     {
     va_list strPrms;
     va_start (strPrms, str);
 
-    PrintfHeart (arr, N, str, strPrms);
+    PrintfHeart (arr, N,     lEdge, curr, rEdge, numeration, str, strPrms);
 
     va_end (strPrms);
     }
 
 //-----------------------------------------------------------------------------
 template <typename T>
-void Printf (const T arr [], size_t arrsz, const char* str, ...)
+void Printf (const T arr [], size_t arrsz, int lEdge, int curr, int rEdge, bool numeration, const char* str, ...)  //do not make blackcolor in rEdge or al will fuck up
     {
     va_list strPrms;
     va_start (strPrms, str);
 
-    PrintfHeart (arr, arrsz, str, strPrms);
+    PrintfHeart (arr, arrsz, lEdge, curr, rEdge, numeration, str, strPrms);
 
     va_end (strPrms);
     }
+
+
+
+//-----------------------------------------------------------------------------
+template <typename T>
+void FillArr (T arr [], size_t arrsz)
+    {
+
+    for (int i = 0; i < arrsz; i++)
+        {
+        arr[i] = rand() % Range;
+        }
+    }
+
+//-----------------------------------------------------------------------------
+template <typename T, int N>
+void FillArr (T (&arr) [N])
+    {
+    FillArr (arr, N);
+    }
+
 
 //}
 //-----------------------------------------------------------------------------

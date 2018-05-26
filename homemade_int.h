@@ -166,6 +166,7 @@ bool operator == (const int_t& a, const  int_t& b)
 
 void Swap (int_t& a, int_t& b)
     {
+    if (&a == &b) return;
     int_t::swaps_ += 1;
     std::swap (a, b);
     }
