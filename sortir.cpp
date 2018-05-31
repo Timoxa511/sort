@@ -9,7 +9,7 @@
 
 #define id(n) n     //TODO
 
-#define PrintfDebug
+//#define PrintfDebug
 
 
 
@@ -56,7 +56,6 @@ inline void BubbleSort (T (&arr) [N])     //cause arrays are references (shock c
 template <typename T>
 void SelectSort (T arr [], size_t arrsz)
     {
-    printf ("\n");
     for (int i = arrsz - 1; i >= 0; i--)
         {
         //Printf (arr, arrsz, -1, MaxElemNumber(arr, i + 1), i + 1, true, "check ");
@@ -88,6 +87,28 @@ inline void SelectSort (T (&arr) [N])
 //-----------------------------------------------------------------------------
 
 //{Functions-------------------------------------------------------------------
+using sort_fn_t = void (int_t arr [], size_t arrsz);
+void multyfuncStatistic (std::initializer_list <sort_fn_t*> list)
+    {
+    for (auto& sort_fn : list)
+        {
+        int freq = 100;
+        int_t experimentalMouse [freq] = {};
+
+        for (int i = 10; i <= freq; i += 10)
+            {
+            FillArr (experimentalMouse, i);
+
+            int_t::resetCounters ();
+            sort_fn (experimentalMouse, i);
+            printf ("[comps %d | swaps %d]    ", int_t::comps_, int_t::swaps_);
+            }
+        printf ("\n\nnext\n\n");
+        }
+    }
+
+
+//-----------------------------------------------------------------------------
 void Test ()
     {
     const size_t n = 10;
@@ -109,7 +130,7 @@ int main ()
     Test ();
     #else
 
-    BubbleSortTest ();
+    multyfuncStatistic ({BubbleSort, SelectSort});
 
     #endif
     }
