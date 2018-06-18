@@ -1,11 +1,13 @@
 //sorts_pack
-#include "TXLib.h"         //math.h,
+#include "TXLib.h"         //math.h, .....
 #include "homemade_int.h"
 #include "templates.h"     //homemade_int.h
 
 #include <windows.h>
 #include <stdio.h>
 
+
+#include "../sfml_gui/Alib.h" // SFML/graphics.hpp ..
 
 #define id(n) n     //TODO
 
@@ -14,7 +16,40 @@
 
 
 //{Protoypes-------------------------------------------------------------------
+
+struct FnStats
+    {
+    const char* name_;
+    void        (*fn_) (int_t arr [], size_t arrsz);
+
+    std::vector<int> comps_;
+    std::vector<int> swaps_;
+    };
+
+class Resources
+    {
+    public:
+    std::vector <AL::Sprite>  sprites_;
+    std::vector <sf::Texture> textures_;
+    //---------------------
+
+    Resources (std::initializer_list <const char*> fileNames);
+
+
+    };
+
 bool BubbleSortTest ();
+
+namespace Global
+{
+int SIZE = 100;
+size_t STEP = 2;
+Vector WinSize (1000, 1000);
+Resources* Res = nullptr;
+double XSCALE  = 6;
+//sf::RenderWindow* window = nullptr;
+}
+
 //}
 //-----------------------------------------------------------------------------
 
@@ -22,7 +57,12 @@ bool BubbleSortTest ();
 //=============================================================================
 
 
-//{Template_fns----------------------------------------------------------------
+
+//{algorithms------------------------------------------------------------------
+
+
+
+//{fns-------------------------------------------------------------------------
 template <typename T>    //template for sync with int_t for cmp counter
 void BubbleSort (T arr [], size_t arrsz)
     {
@@ -86,58 +126,8 @@ inline void SelectSort (T (&arr) [N])
 //}
 //-----------------------------------------------------------------------------
 
-//{Functions-------------------------------------------------------------------
-using sort_fn_t = void (int_t arr [], size_t arrsz);
-void multyfuncStatistic (std::initializer_list <sort_fn_t*> list)
-    {
-    for (auto& sort_fn : list)
-        {
-        int freq = 100;
-        int_t experimentalMouse [freq] = {};
 
-        for (int i = 10; i <= freq; i += 10)
-            {
-            FillArr (experimentalMouse, i);
-
-            int_t::resetCounters ();
-            sort_fn (experimentalMouse, i);
-            printf ("[comps %d | swaps %d]    ", int_t::comps_, int_t::swaps_);
-            }
-        printf ("\n\nnext\n\n");
-        }
-    }
-
-
-//-----------------------------------------------------------------------------
-void Test ()
-    {
-    const size_t n = 10;
-    int_t arr [n] = {};
-
-    FillArr (arr, n);
-    Printf  (arr, n, 1, 3, 4, true, "zapolnenijje na %u elems", n);
-
-    SelectSort (arr);
-    Printf  (arr, 1, 4, 6, true, "sortirovka");
-
-    }
-
-
-//-----------------------------------------------------------------------------
-int main ()
-    {
-    #ifdef PrintfDebug
-    Test ();
-    #else
-
-    multyfuncStatistic ({BubbleSort, SelectSort});
-
-    #endif
-    }
-
-
-
-//-----------------------------------------------------------------------------
+//{unittests-------------------------------------------------------------------
 
 #define unitTest(initializer_list, expected, swaps, comps)                                                                                        \
     {                                                                                                                                             \
@@ -168,6 +158,190 @@ bool BubbleSortTest ()
     }
 
 #undef unitTest
+
+//}
+//-----------------------------------------------------------------------------
+
+
+
+//}
+//-----------------------------------------------------------------------------
+
+
+//{classes-------------------------------------------------------------------
+
+
+//{Resources::-----------------------------------------------------------------
+
+Resources::Resources (std::initializer_list <const char*> fileNames) :
+    sprites_  (),
+    textures_ (fileNames.size())
+    {
+    int i = 0;
+    for (auto& fileName : fileNames)
+        {
+        textures_.at(i).loadFromFile (fileName);
+
+        AL::Sprite sprite ("res" + std::to_string(i));
+        sprite.setTexture (&textures_.at(i));
+        sprite.setRenderWindow (AL::Global::RenderWindow);
+
+        sprites_.push_back (sprite);
+
+        i++;
+        }
+    }
+
+//}
+//-----------------------------------------------------------------------------
+
+
+//}
+//-----------------------------------------------------------------------------
+
+
+//{Functions-------------------------------------------------------------------
+void fullFnStats (FnStats *stats)
+    {
+
+    int_t experimentalMouse [Global::SIZE] = {};
+
+    for (int i = Global::STEP; i <= Global::SIZE; i += Global::STEP)
+        {
+        int_t::resetCounters ();
+
+        FillArr       (experimentalMouse, i);
+        stats->fn_    (experimentalMouse, i);
+
+        stats->comps_.push_back (int_t::comps_);
+        stats->swaps_.push_back (int_t::swaps_);
+        }
+
+    }
+
+
+
+//-----------------------------------------------------------------------------
+using sort_fn_t = void (int_t arr [], size_t arrsz);
+std::vector <FnStats> mltFullFnStats (std::initializer_list <FnStats> list)
+    {
+    std::vector<FnStats> mltStats;
+
+    for (auto& stats : list)
+        {
+        mltStats.push_back (stats);
+        fullFnStats (&mltStats.back());
+        }
+    return mltStats;
+    }
+
+
+
+//-----------------------------------------------------------------------------
+void Test ()
+    {
+    const size_t n = 10;
+    int_t arr [n] = {};
+
+    FillArr (arr, n);
+    Printf  (arr, n, 1, 3, 4, true, "zapolnenijje na %u elems", n);
+
+    SelectSort (arr);
+    Printf  (arr, 1, 4, 6, true, "sortirovka");
+
+    }
+
+
+
+//-----------------------------------------------------------------------------
+bool WindowIsOpen()
+    {
+    sf::Event event;
+    while (AL::Global::RenderWindow->pollEvent (event) )
+        if (event.type == sf::Event::Closed) return false;
+    return true;
+    }
+
+
+
+//-----------------------------------------------------------------------------
+void Dump (const std::vector<FnStats> &stats)
+    {
+    if (&stats == nullptr) {printf("null_param"); return;}
+
+    for (int i = 0; i < stats.size(); i++)
+        for (int j = 0; j < Global::SIZE; j++)
+            printf ("%s : comps[%d], swaps[%d]\n", stats.at(i).name_, stats.at(i).comps_.at(j), stats.at(i).swaps_.at(j));
+    }
+
+
+
+//-----------------------------------------------------------------------------
+void drawGraph (Vector pos, std::vector<int> dataY, AL::Sprite bullet)
+    {
+
+    //TODO findMaxElem
+
+
+    for (int i = 0; i < dataY.size(); i++)
+        {
+        Draw (bullet, pos + Vector (i*Global::STEP*Global::XSCALE, -dataY.at(i) ));
+        }
+
+    }
+
+
+
+//-----------------------------------------------------------------------------
+void drawStats (std::vector<FnStats> stats, std::vector<AL::Sprite> sprites)
+    {
+    assert (stats.size() <= sprites.size());
+
+    for (int i = 0; i < stats.size(); i++)
+        {
+        drawGraph (Vector (0, Global::WinSize.y),                   stats.at(i).comps_, sprites.at(i));
+        drawGraph (Vector (Global::WinSize.x/2, Global::WinSize.y), stats.at(i).swaps_, sprites.at(i));
+        }
+
+    AL::Global::RenderWindow->display();
+    }
+
+
+
+//-----------------------------------------------------------------------------
+void mProc ()
+    {
+    //std::vector<FnStats> stats = mltFullFnStats ({   FnStats {"SelectSort", SelectSort},
+                                                    // FnStats {"BubbleSort", BubbleSort}   });
+    //drawStats (stats, Global::Res->sprites_);
+
+    while (WindowIsOpen())
+        {
+
+        if (!GetAsyncKeyState (VK_SPACE)) continue;
+
+        std::vector<FnStats> stats = mltFullFnStats ({   FnStats {"SelectSort", SelectSort},
+                                                         FnStats {"BubbleSort", BubbleSort}   });
+        drawStats (stats, Global::Res->sprites_);
+
+        AL::Global::RenderWindow->clear();
+        }
+    }
+
+
+//-----------------------------------------------------------------------------
+int main ()
+    {
+    sf::RenderWindow win (sf::VideoMode (Global::WinSize.x, Global::WinSize.y), "okno");
+    AL::Global::RenderWindow = &win;
+
+    Resources res ({ "ball_3.png", "ball_1.png"});
+    Global::Res = &res;
+
+
+    mProc ();
+    }
+
 
 //}
 //-----------------------------------------------------------------------------
