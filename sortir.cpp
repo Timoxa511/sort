@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 
-#include "../sfml_gui/Alib.h" // SFML/graphics.hpp ..
+#include "../sfml_gui/Alib.h" // SFML/graphics.hpp .. + #include "AlibOperators.hpp"
 
 #define id(n) n     //TODO
 
@@ -26,6 +26,7 @@ struct FnStats
     std::vector<int> swaps_;
     };
 
+
 class Resources
     {
     public:
@@ -38,15 +39,38 @@ class Resources
 
     };
 
+
+class CrdSys
+    {
+    public:
+    Vector origPos_;
+    Vector size_;
+    //---------------------
+
+    CrdSys (Vector origPos,
+            Vector size);
+
+
+    bool draw (AL::Sprite sprite);
+    void draw (AL::Sprite bullet, std::vector<int> dataY);
+
+    Vector localToAbstractCrd (Vector vector);
+    bool spriteInArea (AL::Sprite& sprite);
+
+    };
+
+
+
 bool BubbleSortTest ();
+Vector crdsysfiltre (Vector vector);
 
 namespace Global
 {
-int SIZE = 100;
+int SIZE = 1000;
 size_t STEP = 2;
-Vector WinSize (1000, 1000);
+Vector WinSize (1815, 1090);
 Resources* Res = nullptr;
-double XSCALE  = 6;
+Vector SCALE  (4, 1);
 //sf::RenderWindow* window = nullptr;
 }
 
@@ -58,7 +82,7 @@ double XSCALE  = 6;
 
 
 
-//{algorithms------------------------------------------------------------------
+//{sorts-----------------------------------------------------------------------
 
 
 
@@ -93,17 +117,7 @@ inline void BubbleSort (T (&arr) [N])     //cause arrays are references (shock c
 #define check(f_id)                                     \
 ({int id = f_id; assert (0 <= id && id < arrsz); id;})       //gcc spec
 
-template <typename T>
-void SelectSort (T arr [], size_t arrsz)
-    {
-    for (int i = arrsz - 1; i >= 0; i--)
-        {
-        //Printf (arr, arrsz, -1, MaxElemNumber(arr, i + 1), i + 1, true, "check ");
-        Swap (arr [ check(MaxElemNumber(arr, i + 1)) ], arr[ check(i) ]);
-        }
-    }
 
-//-----------------------------------------------------------------------------
 template <typename T>
 int MaxElemNumber (const T arr [], size_t arrsz)
     {
@@ -115,13 +129,26 @@ int MaxElemNumber (const T arr [], size_t arrsz)
     return maxId;
     }
 
-//-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+template <typename T>
+void SelectSort (T arr [], size_t arrsz)
+    {
+    for (int i = arrsz - 1; i >= 0; i--)
+        {
+        //Printf (arr, arrsz, -1, MaxElemNumber(arr, i + 1), i + 1, true, "check ");
+        Swap (arr [ check(MaxElemNumber(arr, i + 1)) ], arr[ check(i) ]);
+        }
+    }
+
+//-----------------------------------------------------------------------------
 template <typename T, int N>
 inline void SelectSort (T (&arr) [N])
     {
     SelectSort (arr, N);
     }
+
+
 
 //}
 //-----------------------------------------------------------------------------
@@ -168,7 +195,7 @@ bool BubbleSortTest ()
 //-----------------------------------------------------------------------------
 
 
-//{classes-------------------------------------------------------------------
+//{classes--------------------------------------------------------------------
 
 
 //{Resources::-----------------------------------------------------------------
@@ -182,9 +209,11 @@ Resources::Resources (std::initializer_list <const char*> fileNames) :
         {
         textures_.at(i).loadFromFile (fileName);
 
+
         AL::Sprite sprite ("res" + std::to_string(i));
         sprite.setTexture (&textures_.at(i));
         sprite.setRenderWindow (AL::Global::RenderWindow);
+        if (i) sprite.setOrigin (Vector (sprite.getTexture()->getSize())/2);   //fuck this shit lets buy troyka!  //fon is zero kostil' hack hack fuck fuck
 
         sprites_.push_back (sprite);
 
@@ -196,11 +225,71 @@ Resources::Resources (std::initializer_list <const char*> fileNames) :
 //-----------------------------------------------------------------------------
 
 
+
+//{CrdSys::--------------------------------------------------------------------
+
+CrdSys::CrdSys (Vector origPos, //leftTopCornerPos
+                Vector size) :
+    origPos_ (origPos),
+    size_    (size)
+    {
+    }
+
+//=============================================================================
+
+bool CrdSys::draw (AL::Sprite sprite)
+    {
+    if (!spriteInArea(sprite)) return false;
+
+    Draw ( sprite, localToAbstractCrd(sprite.getPosition() + Vector (sprite.getTexture()->getSize())/2)       );
+
+    return true;
+    }
+
+
+//-----------------------------------------------------------------------------
+void CrdSys::draw (AL::Sprite bullet, std::vector<int> dataY)
+    {
+
+    for (int i = 0; i < dataY.size(); i++)
+        {
+        bullet.setPosition (Vector (i*Global::STEP, dataY.at(i)/10)*Global::SCALE);
+        if (!draw (bullet)) ;
+        }
+
+    }
+
+
+//-----------------------------------------------------------------------------
+bool CrdSys::spriteInArea (AL::Sprite& sprite)
+    {
+    assert (sprite.getOrigin() == Vector (sprite.getTexture()->getSize())/2 );
+
+    Vector lt  = localToAbstractCrd(sprite.getPosition());
+
+    return (origPos_ <= lt && lt <= origPos_ + size_);
+    }
+
+
+//-----------------------------------------------------------------------------
+Vector CrdSys::localToAbstractCrd (Vector vector)
+    {
+    return Vector (vector.x, size_.y - vector.y) + origPos_;
+    }
+
+
+//}
+//-----------------------------------------------------------------------------
+
+
+
 //}
 //-----------------------------------------------------------------------------
 
 
 //{Functions-------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
 void fullFnStats (FnStats *stats)
     {
 
@@ -277,17 +366,9 @@ void Dump (const std::vector<FnStats> &stats)
 
 
 //-----------------------------------------------------------------------------
-void drawGraph (Vector pos, std::vector<int> dataY, AL::Sprite bullet)
+void drawFon (AL::Sprite fon)
     {
-
-    //TODO findMaxElem
-
-
-    for (int i = 0; i < dataY.size(); i++)
-        {
-        Draw (bullet, pos + Vector (i*Global::STEP*Global::XSCALE, -dataY.at(i) ));
-        }
-
+    Draw (fon, Vector (0, 0));
     }
 
 
@@ -295,12 +376,18 @@ void drawGraph (Vector pos, std::vector<int> dataY, AL::Sprite bullet)
 //-----------------------------------------------------------------------------
 void drawStats (std::vector<FnStats> stats, std::vector<AL::Sprite> sprites)
     {
-    assert (stats.size() <= sprites.size());
+    assert (stats.size() < sprites.size());   //1st is fon //temporr decision
+
+    drawFon (sprites.at(0));//1st is fon //temporr decision
+
+    CrdSys sysComps (Vector (301,  37), Vector (666, 991));
+
+    CrdSys sysSwaps (Vector (1075, 37), Vector (666, 991));
 
     for (int i = 0; i < stats.size(); i++)
         {
-        drawGraph (Vector (0, Global::WinSize.y),                   stats.at(i).comps_, sprites.at(i));
-        drawGraph (Vector (Global::WinSize.x/2, Global::WinSize.y), stats.at(i).swaps_, sprites.at(i));
+        sysComps.draw (sprites.at(i + 1), stats.at(i).comps_);
+        sysSwaps.draw (sprites.at(i + 1), stats.at(i).swaps_);//1st is fon //temporr decision
         }
 
     AL::Global::RenderWindow->display();
@@ -311,20 +398,15 @@ void drawStats (std::vector<FnStats> stats, std::vector<AL::Sprite> sprites)
 //-----------------------------------------------------------------------------
 void mProc ()
     {
-    //std::vector<FnStats> stats = mltFullFnStats ({   FnStats {"SelectSort", SelectSort},
-                                                    // FnStats {"BubbleSort", BubbleSort}   });
-    //drawStats (stats, Global::Res->sprites_);
+    std::vector<FnStats> stats = mltFullFnStats ({   FnStats {"SelectSort", SelectSort},
+                                                     FnStats {"BubbleSort", BubbleSort}   });
+    drawStats (stats, Global::Res->sprites_);
 
     while (WindowIsOpen())
         {
 
-        if (!GetAsyncKeyState (VK_SPACE)) continue;
 
-        std::vector<FnStats> stats = mltFullFnStats ({   FnStats {"SelectSort", SelectSort},
-                                                         FnStats {"BubbleSort", BubbleSort}   });
-        drawStats (stats, Global::Res->sprites_);
 
-        AL::Global::RenderWindow->clear();
         }
     }
 
@@ -335,9 +417,14 @@ int main ()
     sf::RenderWindow win (sf::VideoMode (Global::WinSize.x, Global::WinSize.y), "okno");
     AL::Global::RenderWindow = &win;
 
-    Resources res ({ "ball_3.png", "ball_1.png"});
+    Resources res ({ "fon.jpg", "carrot_lady1.png",
+                                "carrot_lady2.png",
+                                "carrot_lady3.png",
+                                "carrot_lady4.png",
+                                "carrot_lady5.png" });
+    //FindFirstFile("");
     Global::Res = &res;
-
+                                                                       //loadFromDir ("") TODO  DIR
 
     mProc ();
     }
@@ -373,22 +460,6 @@ int main ()
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
 
 
