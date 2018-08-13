@@ -2,11 +2,10 @@
 #ifndef HINT
 #define HINT
 
-#define _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES 1
 
 #pragma GCC diagnostic ignored "-Weffc++"
 
-//#include <sfml/graphics.hpp>
 #include <windows.h>
 #include <math.h>
 #include <assert.h>
@@ -48,6 +47,14 @@ bool operator <= (const int_t& a, const int_t& b);
 bool operator >  (const int_t& a, const int_t& b);
 bool operator >= (const int_t& a, const int_t& b);
 bool operator == (const int_t& a, const int_t& b);
+
+int_t operator - (const int_t& a, const int_t& b);
+int_t operator + (const int_t& a, const int_t& b);
+int_t operator * (const int_t& a, const int_t& b);
+int_t operator / (const int_t& a, const int_t& b);
+
+int_t operator "" _t (unsigned long long a);
+
 void Swap (int_t& a, int_t& b);
 //}
 //-----------------------------------------------------------------------------
@@ -171,15 +178,9 @@ void Swap (int_t& a, int_t& b)
     std::swap (a, b);
     }
 
-void TempSwap (int_t arr [], int a, int b)
+int_t operator "" _t (unsigned long long a)
     {
-    int_t::swaps_ += 1;
-    std::swap (arr[a], arr[b]);
-    }
-
-int_t operator "" t (unsigned long long a)
-    {
-    return int_t(a);
+    return int_t((int) a);
     }
 
 //}

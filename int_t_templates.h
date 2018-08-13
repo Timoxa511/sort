@@ -1,7 +1,10 @@
 //int & int_t template fns
-//#include "homemade_int.h"
+#include <TXLib.h> //for color only
 #include "homemade_int.h"
 
+
+#define check(f_id)                                     \
+({int id = f_id; assert (0 <= id && id < arrsz); id;})       //gcc spec
 
 
 //{Templates-------------------------------------------------------------------
@@ -27,7 +30,7 @@ int ArrCmp (const T ti [], int tvoiDostizhseniya, const T sinMaminoyPodrugi [], 
 template <typename T, int MI, int KA>
 inline int ArrCmp (const T (&po) [MI], const T (&dor) [KA])
     {
-    ArrCmp (po, MI, dor, KA);
+    return ArrCmp (po, MI, dor, KA);
     }
 
 

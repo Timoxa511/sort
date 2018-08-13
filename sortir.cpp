@@ -1,7 +1,5 @@
 //sorts_pack
 #include "TXLib.h"         //math.h, .....
-#include "homemade_int.h"
-#include "templates.h"     //homemade_int.h
 
 #include <windows.h>
 #include <stdio.h>
@@ -9,21 +7,21 @@
 
 #include "../sfml_gui/Alib.h" // SFML/graphics.hpp .. + #include "AlibOperators.hpp"
 
-#define id(n) n     //TODO
 
-//#define PrintfDebug
+#include "homemade_int.h"
+#include "int_t_templates.h"     //homemade_int.h
 
-
+#include "ISort.h"
+//#include ""
 
 //{Protoypes-------------------------------------------------------------------
 
-struct FnStats
+struct Stats
     {
-    const char* name_;
-    void        (*fn_) (int_t arr [], size_t arrsz);
+    const char*      name_;
 
-    std::vector<int> comps_;
-    std::vector<int> swaps_;
+    std::vector<unsigned int> comps_;
+    std::vector<unsigned int> swaps_;
     };
 
 
@@ -52,7 +50,7 @@ class CrdSys
 
 
     bool draw (AL::Sprite sprite);
-    void draw (AL::Sprite bullet, std::vector<int> dataY);
+    void draw (AL::Sprite bullet, std::vector<unsigned int> dataY);
 
     Vector localToAbstractCrd (Vector vector);
     bool spriteInArea (AL::Sprite& sprite);
@@ -71,6 +69,7 @@ size_t STEP = 2;
 Vector WinSize (1815, 1090);
 Resources* Res = nullptr;
 Vector SCALE  (4, 1);
+FILE* Log = nullptr;
 //sf::RenderWindow* window = nullptr;
 }
 
@@ -87,65 +86,18 @@ Vector SCALE  (4, 1);
 
 
 //{fns-------------------------------------------------------------------------
-template <typename T>    //template for sync with int_t for cmp counter
-void BubbleSort (T arr [], size_t arrsz)
-    {
-    for (int i = 0; i < arrsz; i++)
-        {
-        bool sorted = true;
-        for (int j = 0; j < arrsz - 1 - i; j++)
-            {
-            assert (0 <= j && j < arrsz);
-            assert (0 <= j + 1 && j + 1 < arrsz);
-
-            if (arr[j] > arr[j + 1])  { Swap (arr[j], arr[j + 1]); sorted = false; }
-            }
-        if (sorted) break;
-        }
-    }
-
-//-----------------------------------------------------------------------------
 template <typename T, int N>               //inline means substitution fn in compiling time (for speed) (good compilers and optimizers do it themselves)
 inline void BubbleSort (T (&arr) [N])     //cause arrays are references (shock content!) and in template fns types of the prms should be given correctly
     {
-    BubbleSort (arr, N);
+    //BubbleSort (arr, N);
     }
 
-
-
-//-----------------------------------------------------------------------------
-#define check(f_id)                                     \
-({int id = f_id; assert (0 <= id && id < arrsz); id;})       //gcc spec
-
-
-template <typename T>
-int MaxElemNumber (const T arr [], size_t arrsz)
-    {
-    int maxId = 0;
-    for (int i = 1; i < arrsz; i++)
-        {
-        if (arr[ check(i) ] > arr[ check(maxId) ]) maxId = i;
-        }
-    return maxId;
-    }
-
-
-//-----------------------------------------------------------------------------
-template <typename T>
-void SelectSort (T arr [], size_t arrsz)
-    {
-    for (int i = arrsz - 1; i >= 0; i--)
-        {
-        //Printf (arr, arrsz, -1, MaxElemNumber(arr, i + 1), i + 1, true, "check ");
-        Swap (arr [ check(MaxElemNumber(arr, i + 1)) ], arr[ check(i) ]);
-        }
-    }
 
 //-----------------------------------------------------------------------------
 template <typename T, int N>
 inline void SelectSort (T (&arr) [N])
     {
-    SelectSort (arr, N);
+    //SelectSort (arr, N);
     }
 
 
@@ -171,15 +123,15 @@ inline void SelectSort (T (&arr) [N])
 bool BubbleSortTest ()
     {
 
-    unitTest ({1t}, {1t}, 0, 0);
+    unitTest ({1_t}, {1_t}, 0, 0);
 
-    unitTest ({1t _ 0t}, {0t _ 1t}, 1, 1);
+    unitTest ({1_t _ 0_t}, {0_t _ 1_t}, 1, 1);
 
-    unitTest ({4t _ 1t _ 3t}, {1t _ 3t _ 4t}, 2, 3);
+    unitTest ({4_t _ 1_t _ 3_t}, {1_t _ 3_t _ 4_t}, 2, 3);
 
-    unitTest ({1t _ 2t _ 3t _ 4t _ 5t _ 6t}, {1t _ 2t _ 3t _ 4t _ 5t _ 6t}, 0, 5);
+    unitTest ({1_t _ 2_t _ 3_t _ 4_t _ 5_t _ 6_t}, {1_t _ 2_t _ 3_t _ 4_t _ 5_t _ 6_t}, 0, 5);
 
-    unitTest ({1t _ 3t _ 2t _ 4t _ 5t _ 6t}, {1t _ 2t _ 3t _ 4t _ 5t _ 6t}, 1, 9);
+    unitTest ({1_t _ 3_t _ 2_t _ 4_t _ 5_t _ 6_t}, {1_t _ 2_t _ 3_t _ 4_t _ 5_t _ 6_t}, 1, 9);
 
 
     }
@@ -248,11 +200,12 @@ bool CrdSys::draw (AL::Sprite sprite)
 
 
 //-----------------------------------------------------------------------------
-void CrdSys::draw (AL::Sprite bullet, std::vector<int> dataY)
+void CrdSys::draw (AL::Sprite bullet, std::vector<unsigned int> dataY)
     {
-
     for (int i = 0; i < dataY.size(); i++)
         {
+        fprintf (Global::Log, "CrdSys::draw dataY.at(i) = %d", dataY.at(i));
+
         bullet.setPosition (Vector (i*Global::STEP, dataY.at(i)/10)*Global::SCALE);
         if (!draw (bullet)) ;
         }
@@ -288,40 +241,45 @@ Vector CrdSys::localToAbstractCrd (Vector vector)
 
 
 //{Functions-------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-void fullFnStats (FnStats *stats)
+Stats fullStats (ISort* sort)
     {
+
+    Stats stats {};
+    stats.name_ = sort->getName();
 
     int_t experimentalMouse [Global::SIZE] = {};
 
     for (int i = Global::STEP; i <= Global::SIZE; i += Global::STEP)
         {
-        int_t::resetCounters ();
+        sort->resetStats ();
 
         FillArr       (experimentalMouse, i);
-        stats->fn_    (experimentalMouse, i);
+        sort->sort    (experimentalMouse, i);     //!
 
-        stats->comps_.push_back (int_t::comps_);
-        stats->swaps_.push_back (int_t::swaps_);
+
+        unsigned int swaps = sort->getStats () >> sizeof(int)*8/2;                        // HIWORD
+        unsigned int comps = sort->getStats () << sizeof(int)*8/2 >> sizeof(int)*8/2;     // LOWORD           .h
+                                                                                          // MKDWORD (,)
+
+        stats.comps_.push_back (comps);
+        stats.swaps_.push_back (swaps);
         }
-
+    return stats;
     }
 
 
 
 //-----------------------------------------------------------------------------
 using sort_fn_t = void (int_t arr [], size_t arrsz);
-std::vector <FnStats> mltFullFnStats (std::initializer_list <FnStats> list)
+std::vector <Stats> mltFullStats (std::vector <ISort*> sorts)
     {
-    std::vector<FnStats> mltStats;
+    std::vector<Stats> stats;
 
-    for (auto& stats : list)
+    for (auto& sort : sorts)
         {
-        mltStats.push_back (stats);
-        fullFnStats (&mltStats.back());
+        stats.push_back (fullStats (sort));
         }
-    return mltStats;
+    return stats;
     }
 
 
@@ -354,13 +312,18 @@ bool WindowIsOpen()
 
 
 //-----------------------------------------------------------------------------
-void Dump (const std::vector<FnStats> &stats)
+void Dump (const std::vector<Stats> &stats)
     {
     if (&stats == nullptr) {printf("null_param"); return;}
 
     for (int i = 0; i < stats.size(); i++)
-        for (int j = 0; j < Global::SIZE; j++)
-            printf ("%s : comps[%d], swaps[%d]\n", stats.at(i).name_, stats.at(i).comps_.at(j), stats.at(i).swaps_.at(j));
+        {
+        assert (stats.at(i).swaps_.size() == stats.at(i).comps_.size());
+        for (int j = 0; j < stats.at(i).swaps_.size(); j++)
+            {
+            fprintf (Global::Log, "%s : comps[%d], swaps[%d]\n", stats.at(i).name_, stats.at(i).comps_.at(j), stats.at(i).swaps_.at(j));
+            }
+        }
     }
 
 
@@ -374,7 +337,7 @@ void drawFon (AL::Sprite fon)
 
 
 //-----------------------------------------------------------------------------
-void drawStats (std::vector<FnStats> stats, std::vector<AL::Sprite> sprites)
+void drawStats (std::vector<Stats> stats, std::vector<AL::Sprite> sprites)
     {
     assert (stats.size() < sprites.size());   //1st is fon //temporr decision
 
@@ -396,24 +359,53 @@ void drawStats (std::vector<FnStats> stats, std::vector<AL::Sprite> sprites)
 
 
 //-----------------------------------------------------------------------------
-void mProc ()
+std::vector<ISort*> LoadDlls ()
     {
-    std::vector<FnStats> stats = mltFullFnStats ({   FnStats {"SelectSort", SelectSort},
-                                                     FnStats {"BubbleSort", BubbleSort}   });
-    drawStats (stats, Global::Res->sprites_);
+    std::vector<ISort*> sorts;
 
-    while (WindowIsOpen())
+
+    _WIN32_FIND_DATAA currentFileInfo = {};
+
+    HANDLE prevFile = FindFirstFileA ("*.sort", &currentFileInfo);
+
+    bool nextFile = (prevFile != INVALID_HANDLE_VALUE);
+
+    while (nextFile)
         {
 
+        HMODULE dll = LoadLibrary (currentFileInfo.cFileName);
+        assert (dll);
+        auto create = reinterpret_cast <ISort*(*)()> (GetProcAddress (dll, "Create"));
+        assert (create);
 
+        sorts.push_back (create());
 
+        nextFile = FindNextFileA (prevFile, &currentFileInfo);
         }
+    return sorts;
+    }
+
+
+
+//-----------------------------------------------------------------------------
+void mProc ()
+    {
+    std::vector<Stats> stats = mltFullStats (LoadDlls());  //todo fn loading dlls and rets array of isort ptrs for 1st mltFullStats param
+
+    Dump (stats);
+
+    drawStats (stats, Global::Res->sprites_);                          //firstfile nextfile (to find needed dlls mb make config files)
+
+    while (WindowIsOpen())
+        {}
     }
 
 
 //-----------------------------------------------------------------------------
 int main ()
     {
+    Global::Log = fopen ("Log.txt", "a");
+
     sf::RenderWindow win (sf::VideoMode (Global::WinSize.x, Global::WinSize.y), "okno");
     AL::Global::RenderWindow = &win;
 
@@ -422,7 +414,8 @@ int main ()
                                 "carrot_lady3.png",
                                 "carrot_lady4.png",
                                 "carrot_lady5.png" });
-    //FindFirstFile("");
+
+
     Global::Res = &res;
                                                                        //loadFromDir ("") TODO  DIR
 
