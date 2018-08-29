@@ -1,9 +1,8 @@
 //DLL
 
-#include "int_t_templates.h"  // merge 'em into dll  and link   with com
-#include "homemade_int.h"
+#include "int_t.h"
 
-//int_t.dll
+//static linkage int_t.dll
 
 #include "ISort.h"
 
@@ -35,8 +34,6 @@ class BubbleSort : public ISort
     {
     virtual void sort (int_t arr [], size_t arrsz) override;
     virtual const char*  getName ()                override;
-    virtual unsigned int getStats ()               override;
-    virtual void       resetStats ()               override;
     };
 
 //-----------------------------------------------------------------------------
@@ -52,18 +49,6 @@ const char* BubbleSort::getName ()
     }
 
 
-//-----------------------------------------------------------------------------
-unsigned int BubbleSort::getStats ()
-    {
-    return ((int_t::swaps_ << sizeof(int)*8/2) | ~(~0 << sizeof(int)*8/2) & int_t::comps_);
-    }
-
-//-----------------------------------------------------------------------------
-void BubbleSort::resetStats ()
-    {
-    int_t::resetCounters ();
-    }
-
 //}
 //-----------------------------------------------------------------------------
 
@@ -73,6 +58,9 @@ ISort* Create ()
     {
     return new BubbleSort;
     }
+
+
+
 
 
 

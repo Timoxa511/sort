@@ -1,18 +1,26 @@
 //sorts_pack
-#include "TXLib.h"         //math.h, .....
 
-#include <windows.h>
-#include <stdio.h>
+#define coolTXcolors
+
+
+
+#ifdef coolTXcolors
+#include <TXLib.h>
+#endif
+
+#include "int_t.h" //static linkage int_t.dll
 
 
 #include "../sfml_gui/Alib.h" // SFML/graphics.hpp .. + #include "AlibOperators.hpp"
 
 
-#include "homemade_int.h"
-#include "int_t_templates.h"     //homemade_int.h
+
 
 #include "ISort.h"
-//#include ""
+
+#include <windows.h>
+#include <stdio.h>
+
 
 //{Protoypes-------------------------------------------------------------------
 
@@ -251,18 +259,13 @@ Stats fullStats (ISort* sort)
 
     for (int i = Global::STEP; i <= Global::SIZE; i += Global::STEP)
         {
-        sort->resetStats ();
+        int_t::resetCounters ();
 
         FillArr       (experimentalMouse, i);
-        sort->sort    (experimentalMouse, i);     //!
-
-
-        unsigned int swaps = sort->getStats () >> sizeof(int)*8/2;                        // HIWORD
-        unsigned int comps = sort->getStats () << sizeof(int)*8/2 >> sizeof(int)*8/2;     // LOWORD           .h
-                                                                                          // MKDWORD (,)
-
-        stats.comps_.push_back (comps);
-        stats.swaps_.push_back (swaps);
+        sort->sort    (experimentalMouse, i);
+                                                    //TODO     sort->getName();
+        stats.comps_.push_back (int_t::getComps());
+        stats.swaps_.push_back (int_t::getSwaps());
         }
     return stats;
     }
@@ -390,11 +393,11 @@ std::vector<ISort*> LoadDlls ()
 //-----------------------------------------------------------------------------
 void mProc ()
     {
-    std::vector<Stats> stats = mltFullStats (LoadDlls());  //todo fn loading dlls and rets array of isort ptrs for 1st mltFullStats param
+    std::vector<Stats> stats = mltFullStats (LoadDlls());
 
     Dump (stats);
 
-    drawStats (stats, Global::Res->sprites_);                          //firstfile nextfile (to find needed dlls mb make config files)
+    drawStats (stats, Global::Res->sprites_);
 
     while (WindowIsOpen())
         {}
@@ -417,7 +420,7 @@ int main ()
 
 
     Global::Res = &res;
-                                                                       //loadFromDir ("") TODO  DIR
+
 
     mProc ();
     }

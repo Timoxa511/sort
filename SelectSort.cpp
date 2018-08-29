@@ -1,9 +1,8 @@
 //DLL
 
-#include "int_t_templates.h"  // merge 'em into dll  and link   with com
-#include "homemade_int.h"
+#include "int_t.h"
 
-//int_t.dll
+//static linkage int_t.dll
 
 #include "ISort.h"
 
@@ -41,8 +40,6 @@ class SelectSort : public ISort
     {
     virtual void sort (int_t arr [], size_t arrsz) override;
     virtual const char*  getName ()                override;
-    virtual unsigned int getStats ()               override;
-    virtual void       resetStats ()               override;
     };
 
 //-----------------------------------------------------------------------------
@@ -57,18 +54,6 @@ const char* SelectSort::getName ()
     return "SelectSort";
     }
 
-
-//-----------------------------------------------------------------------------
-unsigned int SelectSort::getStats ()
-    {
-    return ((int_t::swaps_ << sizeof(int)*8/2) | ~(~0 << sizeof(int)*8/2) & int_t::comps_);    //TODO .h with fanshuy defines
-    }
-
-//-----------------------------------------------------------------------------
-void SelectSort::resetStats ()
-    {
-    int_t::resetCounters ();
-    }
 
 //}
 //-----------------------------------------------------------------------------

@@ -1,74 +1,20 @@
 
-#ifndef HINT
-#define HINT
+// g++ -c int_t.cpp & g++ -shared -o int_t.dll -Wl,--out-implib,libint_t.a int_t.o
 
-#define _USE_MATH_DEFINES 1
+#include "int_t.h"
 
-#pragma GCC diagnostic ignored "-Weffc++"
-
-#include <windows.h>
-#include <math.h>
-#include <assert.h>
-#include <string>
-
-//{Prototypes------------------------------------------------------------------
-
-class int_t
-    {
-    private:
-    int val_;
-    public:
-
-    static int swaps_;
-    static int comps_;
-    //-----------------------------
-
-    public:
-    int_t ();
-    int_t (int val);
-    int_t (const int_t& int_o);
-
-
-    static void resetCounters ();
-
-
-    void operator =   (const int_t& int_o);
-    int* operator &   ();
-         operator int () const;
-
-    int getval () const;
-    };
 
 int int_t::swaps_ = 0;
 int int_t::comps_ = 0;
 
-bool operator <  (const int_t& a, const int_t& b);
-bool operator <= (const int_t& a, const int_t& b);
-bool operator >  (const int_t& a, const int_t& b);
-bool operator >= (const int_t& a, const int_t& b);
-bool operator == (const int_t& a, const int_t& b);
 
-int_t operator - (const int_t& a, const int_t& b);
-int_t operator + (const int_t& a, const int_t& b);
-int_t operator * (const int_t& a, const int_t& b);
-int_t operator / (const int_t& a, const int_t& b);
+//Definition
 
-int_t operator "" _t (unsigned long long a);
-
-void Swap (int_t& a, int_t& b);
-//}
-//-----------------------------------------------------------------------------
-
-
-//=============================================================================
-
-
-//{int_t::---------------------------------------------------------------------
+//{class--int_t::--------------------------------------------------------------
 int_t::int_t () :
     val_ (rand())
     {
     //initialize vars, dont use def constructors }:&
-
     }
 
 //-----------------------------------------------------------------------------
@@ -91,7 +37,20 @@ void int_t::resetCounters ()
 
 
 //-----------------------------------------------------------------------------
-int int_t::getval () const
+unsigned int int_t::getSwaps ()
+    {
+    return swaps_;
+    }
+
+//-----------------------------------------------------------------------------
+unsigned int int_t::getComps ()
+    {
+    return comps_;
+    }
+
+
+//-----------------------------------------------------------------------------
+int int_t::getVal () const
     {
     return val_;
     }
@@ -119,55 +78,55 @@ int* int_t::operator & ()
 //-----------------------------------------------------------------------------
 
 
-//{operators-------------------------------------------------------------------
+//{non_class_operators---------------------------------------------------------
 int_t operator - (const int_t& a, const int_t& b)
     {
-    return a.getval() - b.getval();
+    return a.getVal() - b.getVal();
     }
 
 int_t operator + (const int_t& a, const int_t& b)
     {
-    return a.getval() + b.getval();
+    return a.getVal() + b.getVal();
     }
 
 int_t operator * (const int_t& a, const int_t& b)
     {
-    return a.getval() * b.getval();
+    return a.getVal() * b.getVal();
     }
 
 int_t operator / (const int_t& a, const int_t& b)
     {
-    return a.getval() / b.getval();
+    return a.getVal() / b.getVal();
     }
 
 bool operator < (const int_t& a, const int_t& b)
     {
     int_t::comps_ += 1;
-    return a.getval() < b.getval();
+    return a.getVal() < b.getVal();
     }
 
 bool operator <= (const int_t& a, const int_t& b)
     {
     int_t::comps_ += 1;
-    return a.getval() <= b.getval();
+    return a.getVal() <= b.getVal();
     }
 
 bool operator > (const int_t& a, const int_t& b)
     {
     int_t::comps_ += 1;
-    return a.getval() > b.getval();
+    return a.getVal() > b.getVal();
     }
 
 bool operator >= (const int_t& a, const int_t& b)
     {
     int_t::comps_ += 1;
-    return a.getval() >= b.getval();
+    return a.getVal() >= b.getVal();
     }
 
 bool operator == (const int_t& a, const  int_t& b)
     {
     int_t::comps_ += 1;
-    return a.getval() == b.getval();
+    return a.getVal() == b.getVal();
     }
 
 
@@ -185,14 +144,3 @@ int_t operator "" _t (unsigned long long a)
 
 //}
 //-----------------------------------------------------------------------------
-
-
-
-#endif
-
-
-
-
-
-
-

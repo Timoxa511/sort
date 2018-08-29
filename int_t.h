@@ -1,13 +1,79 @@
-//int & int_t template fns
-#include <TXLib.h> //for color only
-#include "homemade_int.h"
+
+//#ifndef HINT
+//#define HINT
+
+#define _USE_MATH_DEFINES 1
+
+#pragma GCC diagnostic ignored "-Weffc++"
+
+#include <windows.h>
+#include <math.h>
+#include <assert.h>
+#include <string>
+
+
+
+#ifndef coolTXcolors
+#define $sd {;}
+#define $m  {;}
+#define $c  {;}    //-Wempty-body is pretty cutie   <3
+#define $y  {;}
+#define $b  {;}
+#endif
 
 
 #define check(f_id)                                     \
 ({int id = f_id; assert (0 <= id && id < arrsz); id;})       //gcc spec
 
 
-//{Templates-------------------------------------------------------------------
+//{Prototypes------------------------------------------------------------------
+
+class int_t
+    {
+    private:
+    int val_;
+    public:
+
+    static int swaps_;
+    static int comps_;
+    //-----------------------------
+
+    public:
+    int_t ();
+    int_t (int val);
+    int_t (const int_t& int_o);
+
+    int getVal   () const;
+
+    void operator =   (const int_t& int_o);
+    int* operator &   ();
+         operator int () const;
+
+
+    static void       resetCounters ();
+    static unsigned int getSwaps    ();
+    static unsigned int getComps    ();
+    };
+
+bool operator <  (const int_t& a, const int_t& b);
+bool operator <= (const int_t& a, const int_t& b);
+bool operator >  (const int_t& a, const int_t& b);
+bool operator >= (const int_t& a, const int_t& b);
+bool operator == (const int_t& a, const int_t& b);
+
+int_t operator - (const int_t& a, const int_t& b);
+int_t operator + (const int_t& a, const int_t& b);
+int_t operator * (const int_t& a, const int_t& b);
+int_t operator / (const int_t& a, const int_t& b);
+
+int_t operator "" _t (unsigned long long a);
+
+void Swap (int_t& a, int_t& b);
+//}
+//-----------------------------------------------------------------------------
+
+
+//{template_stuff--------------------------------------------------------------
 template <typename T>
 int ArrCmp (const T ti [], int tvoiDostizhseniya, const T sinMaminoyPodrugi [], int podvigiSinaMaminoyPodrugi)
     {
@@ -26,12 +92,14 @@ int ArrCmp (const T ti [], int tvoiDostizhseniya, const T sinMaminoyPodrugi [], 
     return -1; //skaski mne tyt ne raskazivaim kogda uzshe rabotu naidesh, a, a
     }
 
+
 //-----------------------------------------------------------------------------
 template <typename T, int MI, int KA>
 inline int ArrCmp (const T (&po) [MI], const T (&dor) [KA])
     {
     return ArrCmp (po, MI, dor, KA);
     }
+
 
 
 //-----------------------------------------------------------------------------
@@ -41,10 +109,11 @@ int ArrCmp (const T c3p0 [], int c3p0sz, std::initializer_list <T> arr2d2)
     int bufSwaps = int_t::swaps_;
     int bufComps = int_t::comps_;
 
-    int sz = (c3p0sz > arr2d2.size())? arr2d2 : c3p0; //bebob bebob bebob
+    int sz = (c3p0sz < arr2d2.size())? c3p0sz : arr2d2.size() ; //bebob bebob bebob
+    auto iter = arr2d2.begin();
     for (int i = 0; i < sz; i++)
         {
-        if (c3p0[i] != arr2d2[i]) return i;
+        if (c3p0[i] != *iter++) return i;
         }
 
     int_t::swaps_ = bufSwaps;
@@ -53,10 +122,11 @@ int ArrCmp (const T c3p0 [], int c3p0sz, std::initializer_list <T> arr2d2)
     return -1;
     }
 
+
+
 //-----------------------------------------------------------------------------
-const int Str_param_length = 300;
 template <typename T, int c3p0sz>
-int ArrCmp (const T c3p0 [], std::initializer_list <T> arr2d2)
+int ArrCmp (const T (&c3p0) [c3p0sz], std::initializer_list <T> arr2d2)
     {
     return ArrCmp (c3p0, c3p0sz, arr2d2);
     }
@@ -64,7 +134,10 @@ int ArrCmp (const T c3p0 [], std::initializer_list <T> arr2d2)
 
 
 //-----------------------------------------------------------------------------
+
+const int Str_param_length = 300;
 const int Range = 100;
+
 template <typename T>
 void PrintfHeart (const T arr [], size_t arrsz, int lEdge, int curr, int rEdge, bool numeration, const char* str, va_list strPrms)
     {
@@ -153,5 +226,17 @@ void FillArr (T (&arr) [N])
 
 //}
 //-----------------------------------------------------------------------------
+
+
+//#endif
+
+
+
+
+
+
+
+
+
 
 
