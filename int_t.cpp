@@ -1,11 +1,12 @@
 
 // g++ -c int_t.cpp & g++ -shared -o int_t.dll -Wl,--out-implib,libint_t.a int_t.o
 
+#define DLLFUNC __declspec(dllexport)
+
 #include "int_t.h"
 
-
-int int_t::swaps_ = 0;
-int int_t::comps_ = 0;
+unsigned int int_t::assignments_ = 0;
+unsigned int int_t::comparisons_ = 0;
 
 
 //Definition
@@ -20,32 +21,36 @@ int_t::int_t () :
 //-----------------------------------------------------------------------------
 int_t::int_t (int val) :
     val_ (val)
-    {}
+    {
+    assignments_ += 1;
+    }
 
 //-----------------------------------------------------------------------------
 int_t::int_t (const int_t& int_o) :
     val_ (int_o.val_)
-    {}
+    {
+    assignments_ += 1;
+    }
 
 
 //=============================================================================
 void int_t::resetCounters ()
     {
-    swaps_ = 0;
-    comps_ = 0;
+    assignments_ = 0;
+    comparisons_ = 0;
     }
 
 
 //-----------------------------------------------------------------------------
-unsigned int int_t::getSwaps ()
+unsigned int* int_t::getAssignments ()
     {
-    return swaps_;
+    return &assignments_;
     }
 
 //-----------------------------------------------------------------------------
-unsigned int int_t::getComps ()
+unsigned int* int_t::getComparisons ()
     {
-    return comps_;
+    return &comparisons_;
     }
 
 
@@ -56,10 +61,13 @@ int int_t::getVal () const
     }
 
 
-
+//-----------------------------------------------------------------------------
 void int_t::operator = (const int_t& int_o)
     {
     val_ = int_o.val_;
+    assignments_ += 1;
+    static int _4to_nibud = 0;
+    if (!_4to_nibud++) printf ("int_t::assignments_ 0x%p\n", &assignments_);
     }
 
 //-----------------------------------------------------------------------------
@@ -101,31 +109,31 @@ int_t operator / (const int_t& a, const int_t& b)
 
 bool operator < (const int_t& a, const int_t& b)
     {
-    int_t::comps_ += 1;
+    int_t::comparisons_ += 1;
     return a.getVal() < b.getVal();
     }
 
 bool operator <= (const int_t& a, const int_t& b)
     {
-    int_t::comps_ += 1;
+    int_t::comparisons_ += 1;
     return a.getVal() <= b.getVal();
     }
 
 bool operator > (const int_t& a, const int_t& b)
     {
-    int_t::comps_ += 1;
+    int_t::comparisons_ += 1;
     return a.getVal() > b.getVal();
     }
 
 bool operator >= (const int_t& a, const int_t& b)
     {
-    int_t::comps_ += 1;
+    int_t::comparisons_ += 1;
     return a.getVal() >= b.getVal();
     }
 
 bool operator == (const int_t& a, const  int_t& b)
     {
-    int_t::comps_ += 1;
+    int_t::comparisons_ += 1;
     return a.getVal() == b.getVal();
     }
 
@@ -133,7 +141,6 @@ bool operator == (const int_t& a, const  int_t& b)
 void Swap (int_t& a, int_t& b)
     {
     if (&a == &b) return;
-    int_t::swaps_ += 1;
     std::swap (a, b);
     }
 

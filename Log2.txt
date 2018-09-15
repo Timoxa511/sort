@@ -1,0 +1,130 @@
+int_t.cpp: In static member function 'static unsigned int* int_t::getAssignments()':
+int_t.cpp:46:12: error: invalid conversion from 'int*' to 'unsigned int*' [-fpermissive]
+     return &assignments_;
+            ^~~~~~~~~~~~~
+int_t.cpp: In static member function 'static unsigned int* int_t::getComparisons()':
+int_t.cpp:52:12: error: invalid conversion from 'int*' to 'unsigned int*' [-fpermissive]
+     return &comparisons_;
+            ^~~~~~~~~~~~~
+g++: error: int_t.o: No such file or directory
+Не удается найти W:\sfml\sort\int_t.o
+In file included from sortir.cpp:15:0:
+../sfml_gui/Alib.h: In constructor 'AL::Animation::Animation(iVector, iVector, iVector, double)':
+     ticksPerFrame_       (round ( (double) AL::Global::CPUFrequency / FPS) ),
+                           ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from sortir.cpp:15:0:
+../sfml_gui/Alib.h: In function 'void ExampleTest()':
+ void ExampleTest ()
+      ^~~~~~~~~~~
+../sfml_gui/Alib.h: In function 'void nExampleTest()':
+ void nExampleTest ()
+      ^~~~~~~~~~~~
+sortir.cpp: In function 'bool BubbleSortTest()':
+     }
+     ^
+sortir.cpp: In member function 'void CrdSys::draw(AL::Sprite, std::__debug::vector<unsigned int>)':
+     for (int i = 0; i < dataY.size(); i++)
+                     ~~^~~~~~~~~~~~~~
+         fprintf (Global::Log, "CrdSys::draw dataY.at(i) = %d", dataY.at(i));
+                                                                           ^
+         bullet.setPosition (Vector (i*Global::STEP, dataY.at(i)/10)*Global::SCALE);
+                                     ~^~~~~~~
+         bullet.setPosition (Vector (i*Global::STEP, dataY.at(i)/10)*Global::SCALE);
+                                                     ~~~~~~~~~~~^~~
+         if (!draw (bullet)) ;
+                             ^
+sortir.cpp: In function 'Stats fullStats(ISort*)':
+ Stats fullStats (ISort* sort)
+       ^~~~~~~~~
+     for (int i = Global::STEP; i <= Global::SIZE; i += Global::STEP)
+                          ^~~~
+     for (int i = Global::STEP; i <= Global::SIZE; i += Global::STEP)
+                                                                ^~~~
+sortir.cpp: In function 'std::__debug::vector<Stats> mltFullStats(std::__debug::vector<ISort*>)':
+ std::vector <Stats> mltFullStats (std::vector <ISort*> sorts)
+                     ^~~~~~~~~~~~
+sortir.cpp: In function 'void Test()':
+ void Test ()
+      ^~~~
+sortir.cpp: In function 'bool WindowIsOpen()':
+ bool WindowIsOpen()
+      ^~~~~~~~~~~~
+sortir.cpp: In function 'void Dump(const std::__debug::vector<Stats>&)':
+ void Dump (const std::vector<Stats> &stats)
+      ^~~~
+     if (&stats == nullptr) {printf("null_param"); return;}
+         ~~~~~~~^~~~~~~~~~
+     for (int i = 0; i < stats.size(); i++)
+                     ~~^~~~~~~~~~~~~~
+         for (int j = 0; j < stats.at(i).swaps_.size(); j++)
+                         ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+             fprintf (Global::Log, "%s : comps[%d], swaps[%d]\n", stats.at(i).name_, stats.at(i).comps_.at(j), stats.at(i).swaps_.at(j));
+                                                                                                                                       ^
+sortir.cpp: In function 'void drawFon(AL::Sprite)':
+ void drawFon (AL::Sprite fon)
+      ^~~~~~~
+sortir.cpp: In function 'void drawStats(std::__debug::vector<Stats>, std::__debug::vector<AL::Sprite>)':
+ void drawStats (std::vector<Stats> stats, std::vector<AL::Sprite> sprites)
+      ^~~~~~~~~
+     for (int i = 0; i < stats.size(); i++)
+                     ~~^~~~~~~~~~~~~~
+sortir.cpp: In function 'void drawLegend(std::__debug::vector<Stats>, std::__debug::vector<AL::Sprite>)':
+ void drawLegend (std::vector<Stats> stats, std::vector<AL::Sprite> sprites)
+      ^~~~~~~~~~
+     for (int i = 0; i < stats.size(); i++)
+                     ~~^~~~~~~~~~~~~~
+         Draw (sprites.at(i + 2), Vector(400 - 20*i, 1000));
+                                         ~~~~^~~~~~
+sortir.cpp: In function 'std::__debug::vector<ISort*> LoadDlls()':
+ std::vector<ISort*> LoadDlls ()
+                     ^~~~~~~~
+sortir.cpp: In function 'void mProc()':
+ void mProc ()
+      ^~~~~
+sortir.cpp: In function 'int UserMain()':
+     sf::RenderWindow win (sf::VideoMode (Global::WinSize.x, Global::WinSize.y), "okno");
+                                          ~~~~~~~~~~~~~~~~^
+     sf::RenderWindow win (sf::VideoMode (Global::WinSize.x, Global::WinSize.y), "okno");
+                                                             ~~~~~~~~~~~~~~~~^
+     }
+     ^
+sortir.cpp: In instantiation of 'void BubbleSort(T (&)[N]) [with T = int_t; int N = 1]':
+sortir.cpp:136:5:   required from here
+ inline void BubbleSort (T (&arr) [N])     //cause arrays are references (shock content!) and in template fns types of the prms should be given correctly
+                                    ^
+sortir.cpp: In instantiation of 'void BubbleSort(T (&)[N]) [with T = int_t; int N = 2]':
+sortir.cpp:138:5:   required from here
+sortir.cpp: In instantiation of 'void BubbleSort(T (&)[N]) [with T = int_t; int N = 3]':
+sortir.cpp:140:5:   required from here
+sortir.cpp: In instantiation of 'void BubbleSort(T (&)[N]) [with T = int_t; int N = 6]':
+sortir.cpp:142:5:   required from here
+In file included from sortir.cpp:12:0:
+int_t.h: In instantiation of 'void FillArr(T*, size_t) [with T = int_t; size_t = long long unsigned int]':
+sortir.cpp:266:44:   required from here
+     for (int i = 0; i < arrsz; i++)
+                     ~~^~~~~~~
+sortir.cpp: In instantiation of 'void SelectSort(T (&)[N]) [with T = int_t; int N = 10]':
+sortir.cpp:302:20:   required from here
+ inline void SelectSort (T (&arr) [N])
+                                    ^
+In file included from sortir.cpp:12:0:
+int_t.h: In instantiation of 'int ArrCmp(const T*, int, std::initializer_list<_Tp>) [with T = int_t]':
+int_t.h:131:19:   required from 'int ArrCmp(const T (&)[c3p0sz], std::initializer_list<_Tp>) [with T = int_t; int c3p0sz = 1]'
+sortir.cpp:136:5:   required from here
+     int sz = (c3p0sz < arr2d2.size())? c3p0sz : arr2d2.size() ; //bebob bebob bebob
+              ~~~~~~~~^~~~~~~~~~~~~~~~
+     int sz = (c3p0sz < arr2d2.size())? c3p0sz : arr2d2.size() ; //bebob bebob bebob
+                                       
+int_t.h: In instantiation of 'void PrintfHeart(const T*, size_t, int, int, int, bool, const char*, va_list) [with T = int_t; size_t = long long unsigned int; va_list = char*]':
+int_t.h:189:17:   required from 'void Printf(const T (&)[N], int, int, int, bool, const char*, ...) [with T = int_t; int N = 1]'
+sortir.cpp:136:5:   required from here
+         for (int i = 0; i < arrsz; i++)
+                         ~~^~~~~~~
+         for (int i = 0; i < arrsz; i++)
+                         ~~^~~~~~~
+sortir.cpp: In function 'void Dump(const std::__debug::vector<Stats>&)':
+     if (&stats == nullptr) {printf("null_param"); return;}
+     ^~
+sortir.cpp: In function 'Stats fullStats(ISort*)':
+ Stats fullStats (ISort* sort)
+       ^~~~~~~~~

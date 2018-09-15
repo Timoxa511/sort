@@ -16,7 +16,7 @@
 #ifndef coolTXcolors
 #define $sd {;}
 #define $m  {;}
-#define $c  {;}    //-Wempty-body is pretty cutie   <3
+#define $c  {;}    //-Wempty-body is a pretty cutie   <3
 #define $y  {;}
 #define $b  {;}
 #endif
@@ -25,6 +25,9 @@
 #define check(f_id)                                     \
 ({int id = f_id; assert (0 <= id && id < arrsz); id;})       //gcc spec
 
+#ifndef DLLFUNC 
+#define DLLFUNC __declspec(dllimport)
+#endif
 
 //{Prototypes------------------------------------------------------------------
 
@@ -34,41 +37,41 @@ class int_t
     int val_;
     public:
 
-    static int swaps_;
-    static int comps_;
+    DLLFUNC static unsigned int assignments_;
+    DLLFUNC static unsigned int comparisons_;
     //-----------------------------
 
     public:
-    int_t ();
-    int_t (int val);
-    int_t (const int_t& int_o);
+    DLLFUNC int_t ();
+    DLLFUNC int_t (int val);
+    DLLFUNC int_t (const int_t& int_o);
 
-    int getVal   () const;
+    DLLFUNC int getVal   () const;
 
-    void operator =   (const int_t& int_o);
-    int* operator &   ();
-         operator int () const;
+    DLLFUNC void operator =   (const int_t& int_o);
+    DLLFUNC int* operator &   ();
+    DLLFUNC      operator int () const;
 
 
-    static void       resetCounters ();
-    static unsigned int getSwaps    ();
-    static unsigned int getComps    ();
+    DLLFUNC static void       resetCounters    ();
+    DLLFUNC static unsigned int* getAssignments ();
+    DLLFUNC static unsigned int* getComparisons ();
     };
 
-bool operator <  (const int_t& a, const int_t& b);
-bool operator <= (const int_t& a, const int_t& b);
-bool operator >  (const int_t& a, const int_t& b);
-bool operator >= (const int_t& a, const int_t& b);
-bool operator == (const int_t& a, const int_t& b);
+DLLFUNC bool operator <  (const int_t& a, const int_t& b);
+DLLFUNC bool operator <= (const int_t& a, const int_t& b);
+DLLFUNC bool operator >  (const int_t& a, const int_t& b);
+DLLFUNC bool operator >= (const int_t& a, const int_t& b);
+DLLFUNC bool operator == (const int_t& a, const int_t& b);
 
-int_t operator - (const int_t& a, const int_t& b);
-int_t operator + (const int_t& a, const int_t& b);
-int_t operator * (const int_t& a, const int_t& b);
-int_t operator / (const int_t& a, const int_t& b);
+DLLFUNC int_t operator - (const int_t& a, const int_t& b);
+DLLFUNC int_t operator + (const int_t& a, const int_t& b);
+DLLFUNC int_t operator * (const int_t& a, const int_t& b);
+DLLFUNC int_t operator / (const int_t& a, const int_t& b);
 
-int_t operator "" _t (unsigned long long a);
+DLLFUNC int_t operator "" _t (unsigned long long a);
 
-void Swap (int_t& a, int_t& b);
+DLLFUNC void Swap (int_t& a, int_t& b);
 //}
 //-----------------------------------------------------------------------------
 
@@ -77,8 +80,8 @@ void Swap (int_t& a, int_t& b);
 template <typename T>
 int ArrCmp (const T ti [], int tvoiDostizhseniya, const T sinMaminoyPodrugi [], int podvigiSinaMaminoyPodrugi)
     {
-    int bufSwaps = int_t::swaps_;
-    int bufComps = int_t::comps_;
+    int bufSwaps = int_t::assignments_;
+    int bufComps = int_t::comparisons_;
 
     int sz = (tvoiDostizhseniya > podvigiSinaMaminoyPodrugi)?/*da ne v zshizni, kovo ti obmanivaesh, loshara*/ podvigiSinaMaminoyPodrugi : podvigiSinaMaminoyPodrugi;
     for (int i = 0; i < sz; i++)
@@ -86,8 +89,8 @@ int ArrCmp (const T ti [], int tvoiDostizhseniya, const T sinMaminoyPodrugi [], 
         if (ti[i] != sinMaminoyPodrugi[i]) /*da u tebya net shansov, sore*/ return i; //kak i ozshidalos ot sinaMaminoyPodrugi
         }
 
-    int_t::swaps_ = bufSwaps;
-    int_t::comps_ = bufComps;
+    int_t::assignments_ = bufSwaps;
+    int_t::comparisons_ = bufComps;
 
     return -1; //skaski mne tyt ne raskazivaim kogda uzshe rabotu naidesh, a, a
     }
@@ -106,8 +109,8 @@ inline int ArrCmp (const T (&po) [MI], const T (&dor) [KA])
 template <typename T>
 int ArrCmp (const T c3p0 [], int c3p0sz, std::initializer_list <T> arr2d2)
     {
-    int bufSwaps = int_t::swaps_;
-    int bufComps = int_t::comps_;
+    int bufSwaps = int_t::assignments_;
+    int bufComps = int_t::comparisons_;
 
     int sz = (c3p0sz < arr2d2.size())? c3p0sz : arr2d2.size() ; //bebob bebob bebob
     auto iter = arr2d2.begin();
@@ -116,8 +119,8 @@ int ArrCmp (const T c3p0 [], int c3p0sz, std::initializer_list <T> arr2d2)
         if (c3p0[i] != *iter++) return i;
         }
 
-    int_t::swaps_ = bufSwaps;
-    int_t::comps_ = bufComps;
+    int_t::assignments_ = bufSwaps;
+    int_t::comparisons_ = bufComps;
 
     return -1;
     }
@@ -221,6 +224,15 @@ template <typename T, int N>
 void FillArr (T (&arr) [N])
     {
     FillArr (arr, N);
+    }
+
+
+//-----------------------------------------------------------------------------
+template <typename T>
+void Swap (T& a, T& b)
+    {
+    if (&a == &b) return;
+    std::swap (a, b);
     }
 
 

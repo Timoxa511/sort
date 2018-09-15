@@ -1,11 +1,12 @@
 //sorts_pack
 
+//g++ -c sortir.cpp & g++ sortir.o -o sortir.exe -lint_t -L.
 #define coolTXcolors
-
+#define _CRT_SECURE_NO_WARNINGS //for vs not to cry about it complexes
 
 
 #ifdef coolTXcolors
-#include <TXLib.h>
+#include "TXLib.h"
 #endif
 
 #include "int_t.h" //static linkage int_t.dll
@@ -72,7 +73,7 @@ Vector crdsysfiltre (Vector vector);
 
 namespace Global
 {
-int SIZE = 1000;
+const int SIZE = 1000;
 size_t STEP = 2;
 Vector WinSize (1815, 1090);
 Resources* Res = nullptr;
@@ -121,9 +122,10 @@ inline void SelectSort (T (&arr) [N])
     int_t experimentalMouse [] = initializer_list;                                                                                                \
     int_t::resetCounters ();                                                                                                                      \
     BubbleSort (experimentalMouse);                                                                                                               \
-    if (ArrCmp(experimentalMouse, expected) && int_t::swaps_ == swaps && int_t::comps_ == comps)  {$sg; Printf (experimentalMouse, 1, 3, 5, true, "uTest");}     \
-                                                                                             else {$sr; Printf (experimentalMouse, 1, 3, 5, true, "uTest");}     \
-    printf ("%d, %d\n", int_t::swaps_, int_t::comps_);                                                                                            \
+    if (ArrCmp(experimentalMouse, expected) && int_t::assignments_ == swaps && int_t::comparisons_ == comps)                                      \
+        {$sg; Printf (experimentalMouse, 1, 3, 5, true, "uTest");}                                                                                \
+        else {$sr; Printf (experimentalMouse, 1, 3, 5, true, "uTest");}                                                                           \
+    printf ("%d, %d\n", int_t::assignments_, int_t::comparisons_);                                                                                \
     }
 
 #define _ ,
@@ -141,7 +143,7 @@ bool BubbleSortTest ()
 
     unitTest ({1_t _ 3_t _ 2_t _ 4_t _ 5_t _ 6_t}, {1_t _ 2_t _ 3_t _ 4_t _ 5_t _ 6_t}, 1, 9);
 
-
+    return false;
     }
 
 #undef unitTest
@@ -170,7 +172,7 @@ Resources::Resources (std::initializer_list <const char*> fileNames) :
         textures_.at(i).loadFromFile (fileName);
 
 
-        AL::Sprite sprite ("res" + std::to_string(i));
+        AL::Sprite sprite (std::string("res") + std::to_string(i));
         sprite.setTexture (&textures_.at(i));
         sprite.setRenderWindow (AL::Global::RenderWindow);
         if (i) sprite.setOrigin (Vector (sprite.getTexture()->getSize())/2);   //fuck this shit lets buy troyka!  //fon is zero kostil' hack hack fuck fuck
@@ -264,9 +266,10 @@ Stats fullStats (ISort* sort)
         FillArr       (experimentalMouse, i);
         sort->sort    (experimentalMouse, i);
                                                     //TODO     sort->getName();
-        stats.comps_.push_back (int_t::getComps());
-        stats.swaps_.push_back (int_t::getSwaps());
+        stats.comps_.push_back (*int_t::getComparisons());
+        stats.swaps_.push_back (*int_t::getAssignments());
         }
+    printf ("int_t::getAssignments 0x%p\n", int_t::getAssignments());
     return stats;
     }
 
@@ -331,6 +334,7 @@ void Dump (const std::vector<Stats> &stats)
 
 
 
+
 //-----------------------------------------------------------------------------
 void drawFon (AL::Sprite fon)
     {
@@ -338,26 +342,39 @@ void drawFon (AL::Sprite fon)
     }
 
 
-
 //-----------------------------------------------------------------------------
 void drawStats (std::vector<Stats> stats, std::vector<AL::Sprite> sprites)
     {
-    assert (stats.size() < sprites.size());   //1st is fon //temporr decision
+    assert (stats.size() < sprites.size() - 2);   //1st is fon //temporr decision
 
     drawFon (sprites.at(0));//1st is fon //temporr decision
 
-    CrdSys sysComps (Vector (301,  37), Vector (666, 991));
+    CrdSys sysComps (Vector (365,  290), Vector (435, 535));
 
-    CrdSys sysSwaps (Vector (1075, 37), Vector (666, 991));
+    CrdSys sysSwaps (Vector (1015, 290), Vector (435, 535));
 
     for (int i = 0; i < stats.size(); i++)
         {
-        sysComps.draw (sprites.at(i + 1), stats.at(i).comps_);
-        sysSwaps.draw (sprites.at(i + 1), stats.at(i).swaps_);//1st is fon //temporr decision
+        sysComps.draw (sprites.at(i + 2), stats.at(i).comps_);
+        sysSwaps.draw (sprites.at(i + 2), stats.at(i).swaps_);//1st is fon //temporr decision
         }
-
-    AL::Global::RenderWindow->display();
     }
+
+
+//-----------------------------------------------------------------------------
+void drawLegend (std::vector<Stats> stats, std::vector<AL::Sprite> sprites)
+    {
+    assert (stats.size() < sprites.size() - 2);
+
+    printf("mew");
+    Draw(sprites.at(1), Vector(400, 1000));
+    for (int i = 0; i < stats.size(); i++)
+        {
+        printf ("\n Name: %s", stats.at(i).name_);
+        Draw (sprites.at(i + 2), Vector(400 - 20*i, 1000));
+        }
+    }
+
 
 
 
@@ -397,7 +414,11 @@ void mProc ()
 
     Dump (stats);
 
-    drawStats (stats, Global::Res->sprites_);
+    drawStats  (stats, Global::Res->sprites_);
+    drawLegend (stats, Global::Res->sprites_);
+
+    AL::Global::RenderWindow->display();
+
 
     while (WindowIsOpen())
         {}
@@ -412,17 +433,20 @@ int main ()
     sf::RenderWindow win (sf::VideoMode (Global::WinSize.x, Global::WinSize.y), "okno");
     AL::Global::RenderWindow = &win;
 
-    Resources res ({ "fon.jpg", "carrot_lady1.png",
-                                "carrot_lady2.png",
-                                "carrot_lady3.png",
-                                "carrot_lady4.png",
-                                "carrot_lady5.png" });
+    Resources res ({ "field.jpg",
+                     "wagon.png",
+                     "carrot_lady1.png",
+                     "carrot_lady2.png",
+                     "carrot_lady3.png",
+                     "carrot_lady4.png",
+                     "carrot_lady5.png" });
 
 
     Global::Res = &res;
 
 
     mProc ();
+    return 0;
     }
 
 

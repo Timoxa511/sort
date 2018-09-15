@@ -1,10 +1,10 @@
 //DLL
 
-#include "int_t.h"
+#include "../int_t.h"
 
 //static linkage int_t.dll
 
-#include "ISort.h"
+#include "../ISort.h"
 
 
 extern "C" ISort* Create ();
