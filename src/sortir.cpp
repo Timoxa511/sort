@@ -6,6 +6,7 @@
 
 
 #ifdef coolTXcolors
+//#define _TX_ALLOC_BREAK 1206 
 #include "TXLib.h"
 #endif
 
@@ -73,7 +74,7 @@ Vector crdsysfiltre (Vector vector);
 
 namespace Global
 {
-const int SIZE = 1000;
+const int SIZE = 100;
 size_t STEP = 2;
 Vector WinSize (1815, 1090);
 Resources* Res = nullptr;
@@ -386,6 +387,15 @@ std::vector<ISort*> LoadDlls ()
 
     _WIN32_FIND_DATAA currentFileInfo = {};
 
+    char path [_MAX_DIR] = "";
+    getcwd(path, sizeof(path) - 1);
+
+    
+
+    _chdir("../res_sorts");
+    
+   
+
     HANDLE prevFile = FindFirstFileA ("*.sort", &currentFileInfo);
 
     bool nextFile = (prevFile != INVALID_HANDLE_VALUE);
@@ -402,6 +412,9 @@ std::vector<ISort*> LoadDlls ()
 
         nextFile = FindNextFileA (prevFile, &currentFileInfo);
         }
+
+    _chdir(path);
+
     return sorts;
     }
 
@@ -433,13 +446,13 @@ int main ()
     sf::RenderWindow win (sf::VideoMode (Global::WinSize.x, Global::WinSize.y), "okno");
     AL::Global::RenderWindow = &win;
 
-    Resources res ({ "field.jpg",
-                     "wagon.png",
-                     "carrot_lady1.png",
-                     "carrot_lady2.png",
-                     "carrot_lady3.png",
-                     "carrot_lady4.png",
-                     "carrot_lady5.png" });
+    Resources res ({ "../res/field.jpg",
+                     "../res/wagon.png",
+                     "../res/carrot_lady1.png",
+                     "../res/carrot_lady2.png",
+                     "../res/carrot_lady3.png",
+                     "../res/carrot_lady4.png",
+                     "../res/carrot_lady5.png" });
 
 
     Global::Res = &res;

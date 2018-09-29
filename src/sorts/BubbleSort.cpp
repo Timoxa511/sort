@@ -7,7 +7,7 @@
 #include "../ISort.h"
 
 
-extern "C" ISort* Create ();
+extern "C" _declspec(dllexport) ISort* Create ();
 
 //-----------------------------------------------------------------------------
 template <typename T>
@@ -39,6 +39,7 @@ class BubbleSort : public ISort
 //-----------------------------------------------------------------------------
 void BubbleSort::sort (int_t arr [], size_t arrsz)
     {
+    printf ("\nname : %s\n array sz = %d\nprogress bar", getName(), arrsz);
     Sort<int_t> (arr, arrsz);
     }
 
