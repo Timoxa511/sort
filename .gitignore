@@ -14,11 +14,37 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
-# MinGW 
-*.o
+# MinGW  
 *.save
-*.exe
 *.log
+#bin
+*.o
+*.a
+
+# VS rags:)
+*.ilk
+*.pdb
+*.idb
+*.exp
+*.log
+*.filters
+*.xml
+*.user
+*.tlog/
+*.vs/
+#bin
+*.obj
+*.lib
+
+#Bin
+*.exe
+*.dll
+*.sort
+
+
+#hiding SFML
+SFML*/
+
 
 # Windows shortcuts
 *.lnk
@@ -52,7 +78,9 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# tempo secreting vs
-*vs2017*
+
+       
+
+ 
 
 
