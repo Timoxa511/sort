@@ -6,19 +6,15 @@
 
 
 #ifdef coolTXcolors
-//#define _TX_ALLOC_BREAK 1206 
-#include "TXLib.h"
+#include "TXLib.h"  //only for colors
 #endif
+
+#include "Alib.h" // SFML/graphics.hpp .. + #include "AlibOperators.hpp"
 
 #include "int_t.h" //static linkage int_t.dll
 
+#include "ISort.h"  //dll interface class for interaction
 
-#include "../sfml_gui/Alib.h" // SFML/graphics.hpp .. + #include "AlibOperators.hpp"
-
-
-
-
-#include "ISort.h"
 
 #include <windows.h>
 #include <stdio.h>
@@ -390,11 +386,11 @@ std::vector<ISort*> LoadDlls ()
     char path [_MAX_DIR] = "";
     getcwd(path, sizeof(path) - 1);
 
-    
+
 
     _chdir("../res_sorts");
-    
-   
+
+
 
     HANDLE prevFile = FindFirstFileA ("*.sort", &currentFileInfo);
 
@@ -446,13 +442,13 @@ int main ()
     sf::RenderWindow win (sf::VideoMode (Global::WinSize.x, Global::WinSize.y), "okno");
     AL::Global::RenderWindow = &win;
 
-    Resources res ({ "../res/field.jpg",
-                     "../res/wagon.png",
-                     "../res/carrot_lady1.png",
-                     "../res/carrot_lady2.png",
-                     "../res/carrot_lady3.png",
-                     "../res/carrot_lady4.png",
-                     "../res/carrot_lady5.png" });
+    Resources res ({ "Y:/res/field.jpg",
+                     "Y:/res/wagon.png",
+                     "Y:/res/carrot_lady1.png",
+                     "Y:/res/carrot_lady2.png",
+                     "Y:/res/carrot_lady3.png",
+                     "Y:/res/carrot_lady4.png",
+                     "Y:/res/carrot_lady5.png" });
 
 
     Global::Res = &res;

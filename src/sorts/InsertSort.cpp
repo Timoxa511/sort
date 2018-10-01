@@ -7,7 +7,7 @@
 #include "../ISort.h"
 
 
-extern "C" _declspec(dllexport) ISort* Create ();
+extern "C" __declspec(dllexport) ISort* Create ();
 
 //-----------------------------------------------------------------------------
 template <typename T>
