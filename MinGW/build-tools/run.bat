@@ -1,0 +1,2 @@
+pushd ..\output
+sortir.exe

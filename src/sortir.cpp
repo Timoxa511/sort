@@ -68,16 +68,35 @@ class CrdSys
 bool BubbleSortTest ();
 Vector crdsysfiltre (Vector vector);
 
+void Test ();
+void Dump (const std::vector<Stats> &stats);
+
+void drawLegend (std::vector<Stats> stats, std::vector<AL::Sprite> sprites);
+void drawStats  (std::vector<Stats> stats, std::vector<AL::Sprite> sprites);
+void drawFon    (AL::Sprite fon);
+
+
+std::vector <Stats> mltFullStats (std::vector <ISort*> sorts);
+Stats fullStats (ISort* sort);
+
+
+std::vector<ISort*> LoadDlls ();
+
+
+bool WindowIsOpen();
+void mProc ();
+
 namespace Global
-{
-const int SIZE = 100;
-size_t STEP = 2;
-Vector WinSize (1815, 1090);
-Resources* Res = nullptr;
-Vector SCALE  (4, 1);
-FILE* Log = nullptr;
-//sf::RenderWindow* window = nullptr;
-}
+    {
+    const unsigned SIZE = 100;
+    const unsigned STEP = 2;
+    const uVector WinSize (1815, 1090);
+    const  Vector SCALE  (4, 1);
+
+    Resources* Res = nullptr;
+
+    FILE* Log = nullptr;
+    }
 
 //}
 //-----------------------------------------------------------------------------
@@ -86,75 +105,7 @@ FILE* Log = nullptr;
 //=============================================================================
 
 
-
-//{sorts-----------------------------------------------------------------------
-
-
-
-//{fns-------------------------------------------------------------------------
-template <typename T, int N>               //inline means substitution fn in compiling time (for speed) (good compilers and optimizers do it themselves)
-inline void BubbleSort (T (&arr) [N])     //cause arrays are references (shock content!) and in template fns types of the prms should be given correctly
-    {
-    //BubbleSort (arr, N);
-    }
-
-
-//-----------------------------------------------------------------------------
-template <typename T, int N>
-inline void SelectSort (T (&arr) [N])
-    {
-    //SelectSort (arr, N);
-    }
-
-
-
-//}
-//-----------------------------------------------------------------------------
-
-
-//{unittests-------------------------------------------------------------------
-
-#define unitTest(initializer_list, expected, swaps, comps)                                                                                        \
-    {                                                                                                                                             \
-    int_t experimentalMouse [] = initializer_list;                                                                                                \
-    int_t::resetCounters ();                                                                                                                      \
-    BubbleSort (experimentalMouse);                                                                                                               \
-    if (ArrCmp(experimentalMouse, expected) && int_t::assignments_ == swaps && int_t::comparisons_ == comps)                                      \
-        {$sg; Printf (experimentalMouse, 1, 3, 5, true, "uTest");}                                                                                \
-        else {$sr; Printf (experimentalMouse, 1, 3, 5, true, "uTest");}                                                                           \
-    printf ("%d, %d\n", int_t::assignments_, int_t::comparisons_);                                                                                \
-    }
-
-#define _ ,
-
-bool BubbleSortTest ()
-    {
-
-    unitTest ({1_t}, {1_t}, 0, 0);
-
-    unitTest ({1_t _ 0_t}, {0_t _ 1_t}, 1, 1);
-
-    unitTest ({4_t _ 1_t _ 3_t}, {1_t _ 3_t _ 4_t}, 2, 3);
-
-    unitTest ({1_t _ 2_t _ 3_t _ 4_t _ 5_t _ 6_t}, {1_t _ 2_t _ 3_t _ 4_t _ 5_t _ 6_t}, 0, 5);
-
-    unitTest ({1_t _ 3_t _ 2_t _ 4_t _ 5_t _ 6_t}, {1_t _ 2_t _ 3_t _ 4_t _ 5_t _ 6_t}, 1, 9);
-
-    return false;
-    }
-
-#undef unitTest
-
-//}
-//-----------------------------------------------------------------------------
-
-
-
-//}
-//-----------------------------------------------------------------------------
-
-
-//{classes--------------------------------------------------------------------
+//{classes---------------------------------------------------------------------
 
 
 //{Resources::-----------------------------------------------------------------
@@ -207,14 +158,16 @@ bool CrdSys::draw (AL::Sprite sprite)
 
 
 //-----------------------------------------------------------------------------
-void CrdSys::draw (AL::Sprite bullet, std::vector<unsigned int> dataY)
+void CrdSys::draw (AL::Sprite sprite, std::vector<unsigned int> dataY)
     {
-    for (int i = 0; i < dataY.size(); i++)
-        {
-        fprintf (Global::Log, "CrdSys::draw dataY.at(i) = %d", dataY.at(i));
+    assert (dataY.size() < UINT_MAX);
 
-        bullet.setPosition (Vector (i*Global::STEP, dataY.at(i)/10)*Global::SCALE);
-        if (!draw (bullet)) ;
+    for (unsigned i = 0; i < dataY.size(); i++)
+        {
+        fprintf (Global::Log, "CrdSys::draw dataY.at(i) = %u", dataY.at(i));
+
+        sprite.setPosition (Vector ((float) (i*Global::STEP), (float) (dataY.at(i)/10))*Global::SCALE);
+        if (!draw (sprite)) return;
         }
 
     }
@@ -247,6 +200,7 @@ Vector CrdSys::localToAbstractCrd (Vector vector)
 //-----------------------------------------------------------------------------
 
 
+
 //{Functions-------------------------------------------------------------------
 Stats fullStats (ISort* sort)
     {
@@ -256,7 +210,7 @@ Stats fullStats (ISort* sort)
 
     int_t experimentalMouse [Global::SIZE] = {};
 
-    for (int i = Global::STEP; i <= Global::SIZE; i += Global::STEP)
+    for (unsigned i = Global::STEP; i <= Global::SIZE; i += Global::STEP)
         {
         int_t::resetCounters ();
 
@@ -273,7 +227,6 @@ Stats fullStats (ISort* sort)
 
 
 //-----------------------------------------------------------------------------
-using sort_fn_t = void (int_t arr [], size_t arrsz);
 std::vector <Stats> mltFullStats (std::vector <ISort*> sorts)
     {
     std::vector<Stats> stats;
@@ -285,21 +238,6 @@ std::vector <Stats> mltFullStats (std::vector <ISort*> sorts)
     return stats;
     }
 
-
-
-//-----------------------------------------------------------------------------
-void Test ()
-    {
-    const size_t n = 10;
-    int_t arr [n] = {};
-
-    FillArr (arr, n);
-    Printf  (arr, n, 1, 3, 4, true, "zapolnenijje na %u elems", n);
-
-    SelectSort (arr);
-    Printf  (arr, 1, 4, 6, true, "sortirovka");
-
-    }
 
 
 
@@ -317,14 +255,18 @@ bool WindowIsOpen()
 //-----------------------------------------------------------------------------
 void Dump (const std::vector<Stats> &stats)
     {
+    #pragma GCC diagnostic ignored "-Wnonnull-compare"
+    #pragma GCC diagnostic ignored "-Waddress"
     if (&stats == nullptr) {printf("null_param"); return;}
+    #pragma GCC diagnostic default "-Waddress"
+    #pragma GCC diagnostic default "-Wnonnull-compare"
 
-    for (int i = 0; i < stats.size(); i++)
+    for (unsigned i = 0; i < stats.size(); i++)
         {
         assert (stats.at(i).swaps_.size() == stats.at(i).comps_.size());
-        for (int j = 0; j < stats.at(i).swaps_.size(); j++)
+        for (unsigned j = 0; j < stats.at(i).swaps_.size(); j++)
             {
-            fprintf (Global::Log, "%s : comps[%d], swaps[%d]\n", stats.at(i).name_, stats.at(i).comps_.at(j), stats.at(i).swaps_.at(j));
+            fprintf (Global::Log, "%s : comps[%u], swaps[%u]\n", stats.at(i).name_, stats.at(i).comps_.at(j), stats.at(i).swaps_.at(j));
             }
         }
     }
@@ -342,7 +284,7 @@ void drawFon (AL::Sprite fon)
 //-----------------------------------------------------------------------------
 void drawStats (std::vector<Stats> stats, std::vector<AL::Sprite> sprites)
     {
-    assert (stats.size() < sprites.size() - 2);   //1st is fon //temporr decision
+    assert (stats.size() <= sprites.size() - 2);   //1st is fon //temporr decision
 
     drawFon (sprites.at(0));//1st is fon //temporr decision
 
@@ -350,7 +292,7 @@ void drawStats (std::vector<Stats> stats, std::vector<AL::Sprite> sprites)
 
     CrdSys sysSwaps (Vector (1015, 290), Vector (435, 535));
 
-    for (int i = 0; i < stats.size(); i++)
+    for (unsigned i = 0; i < stats.size(); i++)
         {
         sysComps.draw (sprites.at(i + 2), stats.at(i).comps_);
         sysSwaps.draw (sprites.at(i + 2), stats.at(i).swaps_);//1st is fon //temporr decision
@@ -361,14 +303,13 @@ void drawStats (std::vector<Stats> stats, std::vector<AL::Sprite> sprites)
 //-----------------------------------------------------------------------------
 void drawLegend (std::vector<Stats> stats, std::vector<AL::Sprite> sprites)
     {
-    assert (stats.size() < sprites.size() - 2);
+    assert (stats.size() <= sprites.size() - 2);
 
-    printf("mew");
     Draw(sprites.at(1), Vector(400, 1000));
-    for (int i = 0; i < stats.size(); i++)
+    for (unsigned i = 0; i < stats.size(); i++)
         {
         printf ("\n Name: %s", stats.at(i).name_);
-        Draw (sprites.at(i + 2), Vector(400 - 20*i, 1000));
+        Draw (sprites.at(i + 2), Vector((float) (400 - 20*i), (float) 1000));
         }
     }
 
@@ -388,7 +329,7 @@ std::vector<ISort*> LoadDlls ()
 
 
 
-    _chdir("../res_sorts");
+    _chdir("../res_sorts");  //if there is no directory the default one will stay /in MinGW/
 
 
 
@@ -460,6 +401,8 @@ int main ()
 
 
 //}
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
  //   int ar[10][15]
